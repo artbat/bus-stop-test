@@ -29,65 +29,76 @@ var sampleBusStopsList = {
   ]
 };
 
+var sampleBusStopArrivals = {
+  "lastUpdated": "17:23",
+  "filterOut": [ ],
+  "arrivals": [
+    {
+      "routeId": "K3",
+      "routeName": "K3",
+      "destination": "Roehampton Vale",
+      "estimatedWait": "3 min",
+      "scheduledTime": "16:27",
+      "isRealTime": true,
+      "isCancelled": false
+    },
+    {
+      "routeId": "K3",
+      "routeName": "K3",
+      "destination": "Roehampton Vale",
+      "estimatedWait": "20 min",
+      "scheduledTime": "16:44",
+      "isRealTime": true,
+     "isCancelled": false
+    }
+  ],
+  "serviceDisruptions": {
+    "infoMessages": [],
+    "importantMessages": [],
+    "criticalMessages": []
+  }
+};
 
 
 
-
-describe('proxy', function () {
-  describe('bus stops request', function () {    
+describe('TFL proxy', function () {
+  describe('/markers', function () {    
     
-    it('should translate the bounding box lat long to tfl format', function (done) {
+    it('should translate  our bounding box lat lng format into tfl format', function (done) {
       var path = '/markers?northEast=51.50874245880333,-0.2197265625&southWest=51.481382896100975,-0.263671875';      
       var spy = sinon.spy(request, 'request');
-      var expectedUrl = 'http://countdown.tfl.gov.uk/markers/swLat/51.481382896100975/swLng/-0.263671875/neLat/51.50874245880333/neLng/-0.2197265625/?_dc=1315778608026';
+      var expectedUrl = 'http://countdown.tfl.gov.uk/markers/swLat/51.481382896100975/swLng/-0.263671875/neLat/51.50874245880333/neLng/-0.2197265625/';
       proxy.request(path, function () {});
       assert(spy.calledWithMatch(expectedUrl));
-      spy.reset();
+      spy.restore();
       done();
     });
     
-    // it('should return a list of bus stops within a bounding box', function (done) {
-    //   var url = '/markers?northEast=0.000000,32434&southWest=234234,234234';
-    //   var mock = sinon.stub(request, 'request', function (options, callback) {
-    //     callback(JSON.stringify(sampleBusStopsList));
-    //   });
-    //   proxy.request(url, function (data) {   
-    //     assert.deepEqual(data, sampleBusStopsList);
-    //     done();
-    //   });
-    // });
+    it('should return a list of bus stops within a bounding box', function (done) {
+      var path = '/markers?northEast=51.50874245880333,-0.2197265625&southWest=51.481382896100975,-0.263671875';
+      var mock = sinon.stub(request, 'request', function (options, callback) {
+        callback(JSON.stringify(sampleBusStopsList));
+      });
+      proxy.request(path, function (data) {   
+        assert.deepEqual(data, sampleBusStopsList);
+        done();
+        mock.restore();
+      });
+    });
+
+  });
+
+  describe('/arrivals', function () {
+
+    it('should translate our url to TFL url', function (done) {
+      var path = '/arrivals/58382';      
+      var spy = sinon.spy(request, 'request');
+      var expectedUrl = 'http://countdown.tfl.gov.uk/stopBoard/58382';
+      proxy.request(path, function () {});
+      assert(spy.calledWithMatch(expectedUrl));
+      spy.restore();
+      done();
+    });
 
   });
 });
-
-
-
-
-/*var http = require('http');
-var proxy = require('../proxy.js');
-var sinon = require('sinon');
-
-// var spy = sinon.spy(http, "request");
-
-
-exports.proxy = {
-  'Test we can request a list of markers': function (test) {
-
-
-
-    // http.request('');
-    // p = proxy(http);
-proxy.request('', function(){});
-    test.expect(1);
-    proxy.request('/markers?northEast=0.000000,32434&southWest=234234,234234', function (data) {
-    // console.log('\n\nSPY%s\n', spy.callCount);
-console.log(data)
-      test.equal(data, 2);
-      test.done();
-    });
-  }
-
-
-};
-
-*/
