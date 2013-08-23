@@ -9,7 +9,11 @@ var app = express();
 
 
 app.use(express.logger());
-app.use(express.static(__dirname + 'public/'));
+app.use(express.static(__dirname + '/../public/'));
+
+app.use('/', function (request, response) {
+  response.sendfile('index.html');
+});
 
 
 app.get('/markers*', function(request, response) {
