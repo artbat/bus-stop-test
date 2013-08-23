@@ -64,19 +64,17 @@ var sampleBusStopArrivals = {
 describe('TFL proxy', function () {
   describe('/markers', function () {    
     
-    it('should translate  our bounding box lat lng format into tfl format', function (done) {
-      var path = '/markers?northEast=51.50874245880333,-0.2197265625&southWest=51.481382896100975,-0.263671875';      
+    it('should translate our bounding box lat lng format into tfl format', function (done) {
       var spy = sinon.spy(request, 'request');
-      var expectedUrl = 'http://countdown.tfl.gov.uk/markers/swLat/51.481382896100975/swLng/-0.263671875/neLat/51.50874245880333/neLng/-0.2197265625/';
-      proxy.request(path, function () {});
-      assert(spy.calledWithMatch(expectedUrl));
+      proxy.request('/markers?northEast=51.50874245880333,-0.2197265625&southWest=51.481382896100975,-0.263671875');
+      assert(spy.calledWithMatch('http://countdown.tfl.gov.uk/markers/swLat/51.481382896100975/swLng/-0.263671875/neLat/51.50874245880333/neLng/-0.2197265625/'));
       spy.restore();
       done();
     });
     
     it('should return a list of bus stops within a bounding box', function (done) {
       var path = '/markers?northEast=51.50874245880333,-0.2197265625&southWest=51.481382896100975,-0.263671875';
-      var mock = sinon.stub(request, 'request', function (options, callback) {
+      var mock = sinon.stub(request, 'request', function (path, callback) {
         callback(JSON.stringify(sampleBusStopsList));
       });
       proxy.request(path, function (data) {   
@@ -91,13 +89,23 @@ describe('TFL proxy', function () {
   describe('/arrivals', function () {
 
     it('should translate our url to TFL url', function (done) {
-      var path = '/arrivals/58382';      
       var spy = sinon.spy(request, 'request');
-      var expectedUrl = 'http://countdown.tfl.gov.uk/stopBoard/58382';
-      proxy.request(path, function () {});
-      assert(spy.calledWithMatch(expectedUrl));
+      proxy.request('/arrivals/58382');
+      assert(spy.calledWithMatch('http://countdown.tfl.gov.uk/stopBoard/58382'));
       spy.restore();
       done();
+    });
+
+    it('should return arrivals data', function (done) {
+      var path = '/arrivals/58382';
+      var mock = sinon.stub(request, 'request', function (path, callback) {
+        callback(JSON.stringify(sampleBusStopArrivals));
+      });
+      proxy.request(path, function (data) {   
+        assert.deepEqual(data, sampleBusStopArrivals);
+        done();
+        mock.restore();
+      });
     });
 
   });

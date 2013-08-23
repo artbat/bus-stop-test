@@ -37,7 +37,7 @@ module.exports = function(grunt) {
 
     simplemocha: {
       options: {
-        reporter: 'nyan'
+        reporter: 'spec'
       },
 
       all: { 
