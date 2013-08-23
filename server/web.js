@@ -36,7 +36,7 @@ app.get('/arrivals/*', function(request, response) {
   });
 });
 
-var port = 80;
+var port = process.env.PORT || 5000;
 app.listen(port, function() {
   console.log("Listening on " + port);
 });
