@@ -12,27 +12,28 @@ app.use(express.logger());
 app.use(express.static(__dirname + 'public/'));
 
 
-app.get('/markers/*', function(request, response) {
+app.get('/markers*', function(request, response) {
   proxy.getMarkers(request.url, function (jsonData) {
     var query = url.parse(request.url, true).query;
-    var isJsonP = ((typeof query.ca1llback == 'undefined') === false);
-    response.send(
-      (isJsonP ? query.callback : '') + 
-      JSON.stringify(jsonData) + 
-      (isJsonP ? ')' : '')
-    );
+    var isJsonP = ((typeof query.callback == 'undefined') === false);
+    if (isJsonP) {
+      response.send(query.callback + '(' +JSON.stringify(jsonData) + ')' );
+    } else {
+      response.json(jsonData)
+    }
   });
 });
 
-app.get('/arrivals/*', function(request, response) {
-  proxy.getMarkers(request.url, function (jsonData) {
+app.get('/arrivals*', function(request, response) {
+  proxy.getArrivals(request.url, function (jsonData) {
     var query = url.parse(request.url, true).query;
-    var isJsonP = ((typeof query.ca1llback == 'undefined') === false);
-    response.send(
-      (isJsonP ? query.callback : '') + 
-      JSON.stringify(jsonData) + 
-      (isJsonP ? ')' : '')
-    );
+
+    var isJsonP = ((typeof query.callback == 'undefined') === false);
+    if (isJsonP) {
+      response.send(query.callback + '(' +JSON.stringify(jsonData) + ')' );
+    } else {
+      response.json(jsonData)
+    }
   });
 });
 
