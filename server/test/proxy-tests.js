@@ -66,7 +66,7 @@ describe('TFL proxy', function () {
     
     it('should translate our bounding box lat lng format into tfl format', function (done) {
       var spy = sinon.spy(request, 'request');
-      proxy.request('/markers?northEast=51.50874245880333,-0.2197265625&southWest=51.481382896100975,-0.263671875');
+      proxy.getMarkers('/markers?northEast=51.50874245880333,-0.2197265625&southWest=51.481382896100975,-0.263671875');
       assert(spy.calledWithMatch('http://countdown.tfl.gov.uk/markers/swLat/51.481382896100975/swLng/-0.263671875/neLat/51.50874245880333/neLng/-0.2197265625/'));
       spy.restore();
       done();
@@ -77,7 +77,7 @@ describe('TFL proxy', function () {
       var mock = sinon.stub(request, 'request', function (path, callback) {
         callback(JSON.stringify(sampleBusStopsList));
       });
-      proxy.request(path, function (data) {   
+      proxy.getMarkers(path, function (data) {   
         assert.deepEqual(data, sampleBusStopsList);
         done();
         mock.restore();
@@ -90,7 +90,7 @@ describe('TFL proxy', function () {
 
     it('should translate our url to TFL url', function (done) {
       var spy = sinon.spy(request, 'request');
-      proxy.request('/arrivals/58382');
+      proxy.getArrivals('/arrivals/58382');
       assert(spy.calledWithMatch('http://countdown.tfl.gov.uk/stopBoard/58382'));
       spy.restore();
       done();
@@ -101,7 +101,7 @@ describe('TFL proxy', function () {
       var mock = sinon.stub(request, 'request', function (path, callback) {
         callback(JSON.stringify(sampleBusStopArrivals));
       });
-      proxy.request(path, function (data) {   
+      proxy.getArrivals(path, function (data) {   
         assert.deepEqual(data, sampleBusStopArrivals);
         done();
         mock.restore();
