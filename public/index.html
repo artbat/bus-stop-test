@@ -5,33 +5,100 @@
     <meta charset="utf-8">
     <link href="https://developers.google.com/maps/documentation/javascript/examples/default.css" rel="stylesheet">
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script>
+
+
+
+
+var allMarkers = [];
+
+function clearMarkers() {
+  allMarkers.forEach(function (marker) {
+    marker.setMap(null);
+  });
+  allMarkers = [];
+}
+
+
+
 function initialize() {
   var mapOptions = {
-    zoom: 4,
-    center: new google.maps.LatLng(-25.363882, 131.044922),
+    zoom: 14,
+    center: new google.maps.LatLng(51.363882, -0.015),
     mapTypeId: google.maps.MapTypeId.ROADMAP
   };
 
   var map = window.map = new google.maps.Map(document.getElementById('map-canvas'),
       mapOptions);
 
-  var marker = new google.maps.Marker({
-    position: map.getCenter(),
-    map: map,
-    title: 'Click to zoom'
-  });
-
-  // google.maps.event.addListener(map, 'center_changed', function() {
-  //   // 3 seconds after the center of the map has changed, pan back to the
-  //   // marker.
-  //   window.setTimeout(function() {
-  //     map.panTo(marker.getPosition());
-  //   }, 3000);
+  // var marker = new google.maps.Marker({
+  //   position: map.getCenter(),
+  //   map: map,
+  //   title: 'Click to zoom'
   // });
 
-  map.getBoundz = function () {
+  console.log('HI');
+
+  var foo;
+  google.maps.event.addListener(map, 'center_changed', function() {
+
+    clearTimeout(foo);
+    foo = setTimeout(function () {
+      placeMarkers();
+    }, 100);
+
+    // 3 seconds after the center of the map has changed, pan back to the
+    // marker.
+    // window.setTimeout(function() {
+    //   map.panTo(marker.getPosition());
+    // }, 3000);
+  });
+
+  var infowindow = new google.maps.InfoWindow({
+      content: 'Hello world'
+  });
+
+  // map.getBoundz = function () {
+  //   var bounds = map.getBounds();
+  //   return 'http://countdown.tfl.gov.uk/markers/swLat/'+bounds.getSouthWest().lat()+'/swLng/'+bounds.getSouthWest().lng()+'/neLat/'+bounds.getNorthEast().lat()+'/neLng/'+bounds.getNorthEast().lng()+'/?_dc=1315778608026';
+  // }
+  function placeMarkers() {
     var bounds = map.getBounds();
+    var url = '/markers?northEast='+bounds.getNorthEast().lat()+','+bounds.getNorthEast().lng()+
+              '&southWest='+bounds.getSouthWest().lat()+','+bounds.getSouthWest().lng();
+    $.ajax({
+      url: url,
+      success: function (data) {
+        clearMarkers();
+
+        data.markers.forEach(function (markerData) {
+          var marker = new google.maps.Marker({
+            position: myLatlng = new google.maps.LatLng(markerData.lat, markerData.lng),
+            map: map,
+            title: 'Click to zoom'
+          });
+          google.maps.event.addListener(marker, 'click', function() {
+            
+            $.ajax({
+              url: '/arrivals/' + markerData.id, 
+              success: function (arrivalsData) {
+                var content = '<h3>' + markerData.name + (markerData.stopIndicator ? ' ('+markerData.stopIndicator+')' : '') + '</h3>';
+                arrivalsData.arrivals.forEach(function (arrivals) {
+                  content += '<p><strong>' + arrivals.routeName + '</strong>: ' + arrivals.estimatedWait + '</p>';
+                });
+                infowindow.setContent(content);
+                infowindow.open(map,marker);    
+              }
+            })
+
+            
+          });
+          allMarkers.push(marker);
+        });
+      }
+    })
+
     return 'http://countdown.tfl.gov.uk/markers/swLat/'+bounds.getSouthWest().lat()+'/swLng/'+bounds.getSouthWest().lng()+'/neLat/'+bounds.getNorthEast().lat()+'/neLng/'+bounds.getNorthEast().lng()+'/?_dc=1315778608026';
   }
   

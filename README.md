@@ -2,10 +2,16 @@
 
 LBi has one of London's strongest front-end engineering teams. We value HTML, CSS, JavaScript expertise
 
-## The test
-The test is a simple one: build an app to show live depature boards for every bus stop in London.
 
-To help you get started, we've built two simple APIs that leverage TFL's countdown APIs. 
+
+
+
+
+
+## The test
+Your task will be to build an app to show live depature boards for any bus stop in London. We expect 
+
+To help you get started, we've built a simple API that leverages [TFL's countdown APIs | http://developers.tfl.gov.uk]. 
 
 ### GET /bus-stop/all
 
@@ -21,11 +27,77 @@ To help you get started, we've built two simple APIs that leverage TFL's countdo
 
 #### 200 Response
 
-#### 400 Response
+    {
+      "busStops": [
+        ...
+        {
+          "id": "76014",
+          "smsCode": "76014",
+          "name": "Abinger Road",
+          "stopIndicator": null,
+          "towards": "Acton Green",
+          "direction": "w",
+          "lat": 51.49678794165259,
+          "lng": -0.25004038368874176,
+          "routes": [{
+            "id": "94",
+            "name": "94"
+          },{
+            "id": "272",
+            "name": "272"
+          }]
+        },
+        ...
+      ]
+    }
 
+#### 400 Response
+  
+    {
+
+    }
 
 
 
 
 ### GET /bus-stop/{bus-stop-id}
+
+
+#### required parameters
+
+#### Example
+
+
+`/bus-stop/58382`
+
+
+
+#### 200 Response
+
+    {
+      "lastUpdated": "17:23",
+      "filterOut": [ ],
+      "arrivals": [
+        {
+          "routeId": "K3",
+          "routeName": "K3",
+          "destination": "Roehampton Vale",
+          "estimatedWait": "3 min",
+          "scheduledTime": "16:27",
+          "isRealTime": true,
+          "isCancelled": false
+        },
+        ...
+      ]
+      "isCancelled": false
+      }],
+      "serviceDisruptions": {
+        "infoMessages": [],
+        "importantMessages": [],
+        "criticalMessages": []
+      }
+    }
+
+
+
 
