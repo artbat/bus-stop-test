@@ -7,7 +7,7 @@ exports.request = function (path, callback) {
     response.on('data', function (chunk) {
       pageData += chunk;
     });
-    response.on('end', function(){
+    response.on('end', function() {
       callback(pageData);
     });
   });

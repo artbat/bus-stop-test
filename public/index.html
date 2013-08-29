@@ -24,8 +24,8 @@ function clearMarkers() {
 
 function initialize() {
   var mapOptions = {
-    zoom: 14,
-    center: new google.maps.LatLng(51.363882, -0.015),
+    zoom: 15,
+    center: new google.maps.LatLng(51.52172,-0.07151),
     mapTypeId: google.maps.MapTypeId.ROADMAP
   };
 
@@ -38,21 +38,19 @@ function initialize() {
   //   title: 'Click to zoom'
   // });
 
+google.maps.event.addListenerOnce(map, 'idle', function(){
+  placeMarkers();
+});
+
   console.log('HI');
 
   var foo;
-  google.maps.event.addListener(map, 'center_changed', function() {
 
+  google.maps.event.addListener(map, 'center_changed', function() {
     clearTimeout(foo);
     foo = setTimeout(function () {
       placeMarkers();
     }, 100);
-
-    // 3 seconds after the center of the map has changed, pan back to the
-    // marker.
-    // window.setTimeout(function() {
-    //   map.panTo(marker.getPosition());
-    // }, 3000);
   });
 
   var infowindow = new google.maps.InfoWindow({
@@ -65,7 +63,7 @@ function initialize() {
   // }
   function placeMarkers() {
     var bounds = map.getBounds();
-    var url = '/markers?northEast='+bounds.getNorthEast().lat()+','+bounds.getNorthEast().lng()+
+    var url = '/bus-stop/all?northEast='+bounds.getNorthEast().lat()+','+bounds.getNorthEast().lng()+
               '&southWest='+bounds.getSouthWest().lat()+','+bounds.getSouthWest().lng();
     $.ajax({
       url: url,
@@ -81,7 +79,7 @@ function initialize() {
           google.maps.event.addListener(marker, 'click', function() {
             
             $.ajax({
-              url: '/arrivals/' + markerData.id, 
+              url: '/bus-stop/' + markerData.id, 
               success: function (arrivalsData) {
                 var content = '<h3>' + markerData.name + (markerData.stopIndicator ? ' ('+markerData.stopIndicator+')' : '') + '</h3>';
                 arrivalsData.arrivals.forEach(function (arrivals) {
@@ -98,11 +96,11 @@ function initialize() {
         });
       }
     })
-
-    return 'http://countdown.tfl.gov.uk/markers/swLat/'+bounds.getSouthWest().lat()+'/swLng/'+bounds.getSouthWest().lng()+'/neLat/'+bounds.getNorthEast().lat()+'/neLng/'+bounds.getNorthEast().lng()+'/?_dc=1315778608026';
   }
   
 }
+
+
 
 google.maps.event.addDomListener(window, 'load', initialize);
 

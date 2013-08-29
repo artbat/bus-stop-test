@@ -1,6 +1,11 @@
 module.exports = function(grunt) {
-  'use strict';
+  
 
+  // Load grunt NPM tasks
+  require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
+
+
+  // Grunt config
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
@@ -14,15 +19,6 @@ module.exports = function(grunt) {
 
     nodeunit: {
       all: ['server/test/*.js']
-    },
-
-    karma: {
-      unit: {
-        options: {
-          files: ['server/test/*.js'],
-          background: true
-        }
-      }
     },
 
     watch: {
@@ -43,16 +39,32 @@ module.exports = function(grunt) {
       all: { 
         src: 'server/test/*.js' 
       }
-    }
+    },
 
+    nodemon: {
+      dev: {}
+    },
+
+    concurrent: {
+      target: {
+        options: {
+          logConcurrentOutput: true
+        },
+        tasks: [
+          'nodemon', 
+          'watch'
+        ]
+      }
+    }
   });
 
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-contrib-nodeunit');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-karma');
-  grunt.loadNpmTasks('grunt-simple-mocha');
 
-  grunt.registerTask('default', ['jshint', 'simplemocha', 'watch']);
-  // grunt.registerTask('default', ['jshint', 'karma:unit:run', 'watch']);
+  // Grunt tasks
+  grunt.registerTask('default', [
+    'jshint', 
+    'simplemocha', 
+    'concurrent:target'
+  ]);
+  
+
 };
