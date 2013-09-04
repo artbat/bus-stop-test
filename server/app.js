@@ -4,6 +4,7 @@ var url = require('url');
 var express = require('express');
 var app = express();
 var developmentPort = 5000;
+var path = require('path');
 
 
 exports.startServer = function () {
@@ -14,7 +15,7 @@ exports.startServer = function () {
 
 
 function initialiseStaticServer() {
-  app.use(express.static(__dirname + '/../public/'));
+  app.use(express.static(__dirname + '/../client/'));
 }
 
 
@@ -52,9 +53,19 @@ function initialiseRoutes() {
     });
   });
 
-  app.use('/', function (request, response) {
-    response.sendfile('index.html');
+
+  app.get('/', function (request, response) {
+    var pathToIndex = path.resolve(__dirname + '/../client/index.html');
+    response.sendfile(pathToIndex);
   });
+  
+
+  app.use(function (request, response) {
+    response.send(404, {
+      errorMessage: 'The request resource or page was not found'
+    });
+  });
+
 }
 
 
@@ -65,14 +76,3 @@ function startServer() {
   });
 }
 
-
-// function processResponse(jsonData, path) {
-//   var queryStringParameters = url.parse(path, true).query;
-//   var jsonpCallbackName = queryStringParameters.callback;
-//   var isJsonP = typeof jsonpCallbackName !== 'undefined';
-//   if (isJsonP) {
-//     response.send(jsonpCallbackName + '(' +JSON.stringify(jsonData) + ')' );
-//   } else {
-//     response.json(jsonData);
-//   }
-// }
