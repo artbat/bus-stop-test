@@ -1,29 +1,25 @@
-# Le ID Test
+# So you know HTML, CSS & JavaScript?
 
-DigitasLBi has one of the strongest front-end engineering teams in London. 
+DigitasLBi has one of the strongest front-end engineering teams in London. We write HTML, CSS & JavaScript, and get excited by the ever evolving modern front-end development stack: Git, Grunt, Node.js, Require.js, Bower, MV\* architectures, TDD, Automation, Responsive, *etc*.
 
-
-
-We write HTML, CSS & JavaScript, and get excited by the ever evolving modern front-end development stack: Git, Grunt, Node.js, Require.js, Bower, MV\* architectures, TDD, Automation, Responsive *etc*. We're looking for talented developers who are passionate about HTML, CSS & JavaScript, who take pride in their code, and who want to build what's next.
-
-This test is designed to assess your interest and experience in front-end web development. We want to see your code, your approach, and your talent!
+We're looking for talented developers who are passionate about HTML, CSS & JavaScript, who take pride in their code, and who want to build what's next.
 
 ## The test
 
-This test is about buses. From time to time in London you'll need to catch a bus. Some lucky bus stops have live departure boards, but not all do. 
+This test is designed to assess your interest and experience in front-end web development. We want to see your code, your approach, and your talent. 
 
-That's where you come in. As part of this assessment, we'd like you to build an app to show live a depature board for any bus stop in London.
+The test is about buses. From time to time in London you'll need to catch a bus. Some lucky bus stops have live departure boards, but not all do. 
+
+That's where you come in. As part of this assessment, we'd like you to build an app to show live a departure board for any bus stop in London.
 
 
 
 ## What you need to build
 
-The requirements for the bus departure board app are pretty simple:
+The minimum requirements for the bus departure board app are pretty simple:
 
 1. Make sure there's a map, which lets you find any stop in London
-1. Make sure a user can see all imminent departures for a specific stop
-
-You can use the data how you like, just make sure to address the above. 
+1. Make sure a user can select a specific stop, and see its imminent departures
 
 That's it. We leave the design & user-experience to you.
 
@@ -37,7 +33,7 @@ In your app we'll be looking for:
 - Quality of code - *is your code clean & well written?*
 - Eye for detail - *how does your app look?*
 
-If you can't complete your app in time, give us a description of what you were planning / how you would approach it.
+If you can't complete your app in time (we expect most people to spend about an hour), give us a description of what you were planning / how you would approach it.
 
 
 
@@ -51,11 +47,14 @@ If you're going to use an AJAX library, stick with [jQuery](http://jquery.com/).
 
 The bulk of your work will be finding bus stops and bus data. We've written a simple [Bus stop API](#api) using the [TFL bus data](http://www.tfl.gov.uk/businessandpartners/syndication/default.aspx)  that will cover everything you'll need for your app. 
 
+
 ## When you're done
 
 We expect most people to spend about an hour on this, although you're free to use more time if you want.
 
 Once you're done, we'll need you to zip your code and send it to us, so make sure it can work when unzipped.
+
+
 
 <a id="api"></a>
 ## Bus stop API
@@ -145,8 +144,12 @@ There are none.
     }
 
 
+## Final words
+We hope you enjoy building your bus departures app. We're interested in your feedback, so do let us know what you thought.
+
+And most finally, good luck!
+
+
 <div id="logo">
   <img src="img/digitas-lbi.png" alt="DigitasLBi" />
 </div>
-
-

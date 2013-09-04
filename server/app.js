@@ -60,11 +60,11 @@ function initialiseRoutes() {
   });
   
 
-  // app.use(function (request, response) {
-  //   response.send(404, {
-  //     errorMessage: 'The requested resource or page was not found'
-  //   });
-  // });
+  app.use(function (request, response) {
+    response.send(404, {
+      errorMessage: 'The requested resource or page was not found'
+    });
+  });
 
 }
 
