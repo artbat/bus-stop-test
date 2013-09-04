@@ -31,7 +31,6 @@ In your app we'll be looking for:
 
 - Completeness of solution - *does the app work as per the requirements?*
 - Quality of code - *is your code clean & well written?*
-- Eye for detail - *how does your app look?*
 
 If you can't complete your app in time (we expect most people to spend about an hour), give us a description of what you were planning / how you would approach it.
 

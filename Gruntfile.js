@@ -83,7 +83,7 @@ settings.config = function (grunt) {
 
     docco: {
       readme: {
-        src: ['docs/ABOUT.md'],
+        src: ['docs/about.md'],
         options: {
           output: 'client/',
           layout: 'linear',
