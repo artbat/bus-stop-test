@@ -1,11 +1,27 @@
+var settings = {};
+
 module.exports = function(grunt) {
+  settings.loadNpmTasks(grunt);
+  settings.registerTasks(grunt);
+  settings.config(grunt);
+};
   
 
-  // Load grunt NPM tasks
+settings.loadNpmTasks = function (grunt) {
   require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
+};
 
 
-  // Grunt config
+settings.registerTasks = function (grunt) {
+ grunt.registerTask('default', [
+    'jshint', 
+    'simplemocha', 
+    'concurrent:target'
+  ]);
+};
+
+
+settings.config = function (grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
@@ -57,14 +73,7 @@ module.exports = function(grunt) {
       }
     }
   });
-
-
-  // Grunt tasks
-  grunt.registerTask('default', [
-    'jshint', 
-    'simplemocha', 
-    'concurrent:target'
-  ]);
-  
-
 };
+
+
+  
