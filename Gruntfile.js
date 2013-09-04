@@ -1,11 +1,28 @@
+var settings = {};
+
 module.exports = function(grunt) {
+  settings.loadNpmTasks(grunt);
+  settings.registerTasks(grunt);
+  settings.config(grunt);
+};
   
 
-  // Load grunt NPM tasks
+settings.loadNpmTasks = function (grunt) {
   require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
+};
 
 
-  // Grunt config
+settings.registerTasks = function (grunt) {
+ grunt.registerTask('default', [
+    'jshint', 
+    'simplemocha', 
+    'docco',
+    'concurrent:target'
+  ]);
+};
+
+
+settings.config = function (grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
@@ -22,11 +39,18 @@ module.exports = function(grunt) {
     },
 
     watch: {
+      docs: {
+        files: 'docs/**',
+        tasks: [
+          'docco'
+        ]
+      },
       all: {
         files: '<%= jshint.all %>',
         tasks: [
           'jshint',
-          'simplemocha'
+          'simplemocha',
+          'docco'
         ]
       }
     },
@@ -55,16 +79,21 @@ module.exports = function(grunt) {
           'watch'
         ]
       }
+    },
+
+    docco: {
+      readme: {
+        src: ['docs/ABOUT.md'],
+        options: {
+          output: 'client/',
+          layout: 'linear',
+          css: 'docs/css/styles.css',
+          extension: '.litcoffee'
+        }
+      }
     }
   });
-
-
-  // Grunt tasks
-  grunt.registerTask('default', [
-    'jshint', 
-    'simplemocha', 
-    'concurrent:target'
-  ]);
-  
-
 };
+
+
+  

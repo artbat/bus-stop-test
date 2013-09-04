@@ -15,7 +15,7 @@ exports.startServer = function () {
 
 
 function initialiseStaticServer() {
-  app.use(express.static(__dirname + '/../client/'));
+  app.use(express.static(__dirname + '/../../client/'));
 }
 
 
@@ -55,7 +55,7 @@ function initialiseRoutes() {
 
 
   app.get('/', function (request, response) {
-    var pathToIndex = path.resolve(__dirname + '/../client/about.html');
+    var pathToIndex = path.resolve(__dirname + '/../../client/about.html');
     response.sendfile(pathToIndex);
   });
   
