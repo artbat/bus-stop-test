@@ -1,6 +1,6 @@
-var proxy = require('../proxy.js');
+var proxy = require('../src/proxy.js');
 var assert = require('assert');
-var request = require('../request');
+var request = require('../src/request');
 var sinon = require('sinon');
 
 
