@@ -56,8 +56,7 @@ function initialiseRoutes() {
 
   app.get('/', function (request, response) {
     var pathToIndex = path.resolve(__dirname + '/../../client/about.html');
-    // response.sendfile(pathToIndex);
-    response.send(pathToIndex);
+    response.sendfile(pathToIndex);
   });
   
 
