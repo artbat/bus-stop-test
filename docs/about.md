@@ -10,7 +10,7 @@ This test is designed to assess your interest and experience in front-end web de
 
 The test is about buses. From time to time in London you'll need to catch a bus. Some lucky bus stops have live departure boards, but not all do. 
 
-That's where you come in. As part of this assessment, we'd like you to build an app to show live a departure board for any bus stop in London.
+That's where you come in - we'd like you to build an app to show live a departure board for any bus stop in London.
 
 
 
@@ -32,7 +32,7 @@ In your app we'll be looking for:
 - Completeness of solution - *does the app work as per the requirements?*
 - Quality of code - *is your code clean & well written?*
 
-If you can't complete your app in time (we expect most people to spend about an hour), give us a description of what you were planning / how you would approach it.
+If you can't complete your app, give us a description of what you were planning / how you would approach it.
 
 
 
