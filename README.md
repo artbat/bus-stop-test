@@ -1,4 +1,4 @@
-# LBi ID Test
+# DigitasLBi ID Test
 
 
 
@@ -73,37 +73,37 @@ This is used to return a list of bus stops within a bounding box (two points in 
 `/bus-stop/all?northEast=51.52783450,-0.04076115&southWest=51.51560467,-0.10225884`
 
 ##### 200 Response
-```json
-{
-  "busStops": [
-    ...
+
     {
-      "id": "77994",
-      "smsCode": "77994",
-      "name": "Aldersgate Street / Goswell Road",
-      "stopIndicator": "BX",
-      "towards": "Holborn",
-      "direction": "sw",
-      "lat": 51.52363797159915,
-      "lng": -0.09749245212910045,
-      "routes": [{
-        "id": "55",
-        "name": "55"
-      }, {
-        "id": "243",
-        "name": "243"
-      }, {
-        "id": "N35",
-        "name": "N35"
-      }, {
-        "id": "N55",
-        "name": "N55"
-      }]
+      "busStops": [
+        ...
+        {
+          "id": "77994",
+          "smsCode": "77994",
+          "name": "Aldersgate Street / Goswell Road",
+          "stopIndicator": "BX",
+          "towards": "Holborn",
+          "direction": "sw",
+          "lat": 51.52363797159915,
+          "lng": -0.09749245212910045,
+          "routes": [{
+            "id": "55",
+            "name": "55"
+          }, {
+            "id": "243",
+            "name": "243"
+          }, {
+            "id": "N35",
+            "name": "N35"
+          }, {
+            "id": "N55",
+            "name": "N55"
+          }]
+        }
+        ...
+      ]
     }
-    ...
-  ]
-}
-```
+
 
 ##### 400 Response
     {

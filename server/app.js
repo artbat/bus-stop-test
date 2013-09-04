@@ -55,16 +55,16 @@ function initialiseRoutes() {
 
 
   app.get('/', function (request, response) {
-    var pathToIndex = path.resolve(__dirname + '/../client/index.html');
+    var pathToIndex = path.resolve(__dirname + '/../client/about.html');
     response.sendfile(pathToIndex);
   });
   
 
-  app.use(function (request, response) {
-    response.send(404, {
-      errorMessage: 'The request resource or page was not found'
-    });
-  });
+  // app.use(function (request, response) {
+  //   response.send(404, {
+  //     errorMessage: 'The requested resource or page was not found'
+  //   });
+  // });
 
 }
 

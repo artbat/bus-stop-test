@@ -16,6 +16,7 @@ settings.registerTasks = function (grunt) {
  grunt.registerTask('default', [
     'jshint', 
     'simplemocha', 
+    'docco',
     'concurrent:target'
   ]);
 };
@@ -38,11 +39,18 @@ settings.config = function (grunt) {
     },
 
     watch: {
+      docs: {
+        files: 'docs/**',
+        tasks: [
+          'docco'
+        ]
+      },
       all: {
         files: '<%= jshint.all %>',
         tasks: [
           'jshint',
-          'simplemocha'
+          'simplemocha',
+          'docco'
         ]
       }
     },
@@ -70,6 +78,18 @@ settings.config = function (grunt) {
           'nodemon', 
           'watch'
         ]
+      }
+    },
+
+    docco: {
+      readme: {
+        src: ['docs/ABOUT.md'],
+        options: {
+          output: 'client/',
+          layout: 'linear',
+          css: 'docs/css/styles.css',
+          extension: '.litcoffee'
+        }
       }
     }
   });
