@@ -1,9 +1,9 @@
 # So you know <br />HTML, CSS & JavaScript?
 
 
-DigitasLBi has one of the strongest front-end engineering lineups in London. We are passionate about innovating with web standards, best practice, emerging APIs, and are excited by the ever evolving modern front-end development stack: Git, Grunt, Node.js, Require.js, Bower, MV\* architectures, TDD, Responsive, *etc*.
+<!--DigitasLBi has one of the strongest front-end engineering lineups in London. We are passionate about innovating with web standards, best practice, emerging APIs, and are excited by the ever evolving modern front-end development stack: Git, Grunt, Node.js, Require.js, Bower, MV\* architectures, TDD, Responsive, *etc*.
 
-We're looking for talented developers who are passionate about HTML, CSS & JavaScript, who take pride in their code, and who want to build what's next.
+We're looking for talented developers who are passionate about HTML, CSS & JavaScript, who take pride in their code, and who want to build what's next-->
 
 ## The test
 
