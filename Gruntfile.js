@@ -17,7 +17,7 @@ settings.registerTasks = function (grunt) {
     'jshint', 
     'simplemocha', 
     'docco',
-    'concurrent:target'
+    'concurrent:target'    
   ]);
 };
 
@@ -39,6 +39,10 @@ settings.config = function (grunt) {
     },
 
     watch: {
+      options: {
+        livereload: true
+      },
+
       docs: {
         files: 'docs/**',
         tasks: [
@@ -69,6 +73,13 @@ settings.config = function (grunt) {
       dev: {}
     },
 
+    open: {
+      'dev': {
+        path: 'http://localhost:5000/',
+        app: 'Google Chrome'
+      }
+    },
+
     concurrent: {
       target: {
         options: {
@@ -76,6 +87,7 @@ settings.config = function (grunt) {
         },
         tasks: [
           'nodemon', 
+          'open',
           'watch'
         ]
       }

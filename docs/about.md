@@ -1,18 +1,15 @@
-# So you know <br />HTML, CSS & JavaScript?
-
+# You know HTML, CSS & JavaScript?
 
 <!--DigitasLBi has one of the strongest front-end engineering lineups in London. We are passionate about innovating with web standards, best practice, emerging APIs, and are excited by the ever evolving modern front-end development stack: Git, Grunt, Node.js, Require.js, Bower, MV\* architectures, TDD, Responsive, *etc*.
 
 We're looking for talented developers who are passionate about HTML, CSS & JavaScript, who take pride in their code, and who want to build what's next-->
 
-## The test
-
-This test is designed to assess your interest and experience in front-end web development. We want to see your code, your approach, and your talent. 
-
-The test is about buses. From time to time in London you'll need to catch a bus. Some lucky bus stops have live departure boards, but not all do. 
+## Show us
+This task is about buses. From time to time in London you'll need to catch a bus. Some lucky bus stops have live departure boards, but not all do. 
 
 That's where you come in - we'd like you to build an app to show live a departure board for any bus stop in London.
 
+This test is designed to assess your interest and experience in front-end web development. We want to see your code, your approach, and your talent. 
 
 
 ## What you need to build
