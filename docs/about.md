@@ -1,20 +1,18 @@
-# You know HTML, CSS & JavaScript?
+# So you know HTML, CSS & JS?
 
 <!--DigitasLBi has one of the strongest front-end engineering lineups in London. We are passionate about innovating with web standards, best practice, emerging APIs, and are excited by the ever evolving modern front-end development stack: Git, Grunt, Node.js, Require.js, Bower, MV\* architectures, TDD, Responsive, *etc*.
 
 We're looking for talented developers who are passionate about HTML, CSS & JavaScript, who take pride in their code, and who want to build what's next-->
 
-## Show us
-This task is about buses. From time to time in London you'll need to catch a bus. Some lucky bus stops have live departure boards, but not all do. 
+## Show us your skillz
+From time to time in London you'll need to catch a bus. Some lucky bus stops have live departure boards, but not all do. To help,  we'd like you to build an app to show live a departure board for any bus stop in London.
 
-That's where you come in - we'd like you to build an app to show live a departure board for any bus stop in London.
-
-This test is designed to assess your interest and experience in front-end web development. We want to see your code, your approach, and your talent. 
+The task is designed to assess your interest and experience in front-end web development. We want to see your code, your approach, and your talent. 
 
 
 ## What you need to build
 
-The minimum requirements for the bus departure board app are pretty simple:
+The minimum requirements for the bus departure board app are simply defined:
 
 1. Make sure there's a map, which lets you find any stop in London
 1. Make sure a user can select a specific stop, and see its imminent departures
@@ -49,7 +47,7 @@ The bulk of your work will be finding bus stops and bus data. We've written a si
 
 We expect most people to spend about an hour on this, although you're free to use more time if you want.
 
-Once you're done, we'll need you to zip your code and send it to us, so make sure it can work when unzipped.
+Once you're done, you'll need to zip your code and send it to us, so make sure it can work when unzipped.
 
 
 
@@ -142,7 +140,7 @@ There are none.
 
 
 ## Final words
-We hope you enjoy building your bus departures app. We're interested in your feedback, so do let us know what you thought.
+We hope you enjoy building your bus departures app. We're interested in your feedback, so do let us know what you thought of the task.
 
 And most finally, good luck!
 

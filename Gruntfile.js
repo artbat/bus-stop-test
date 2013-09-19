@@ -87,8 +87,8 @@ settings.config = function (grunt) {
         },
         tasks: [
           'nodemon', 
-          'open',
-          'watch'
+          'watch',
+          'open'
         ]
       }
     },
