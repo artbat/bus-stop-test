@@ -5,7 +5,7 @@
 We're looking for talented developers who are passionate about HTML, CSS & JavaScript, who take pride in their code, and who want to build what's next-->
 
 ## Show us your skillz
-From time to time in London you'll need to catch a bus. Some lucky bus stops have live departure boards, but not all do. To help, we'd like you to build an app to show live a departure board for any bus stop in London.
+From time to time in London you'll need to catch a bus. Some lucky bus stops have live departure boards, but not all do. To help, we'd like you to build an app to show a live departure board for any bus stop in London.
 
 The task is designed to assess your interest and experience in front-end web development. We want to see your code, your approach, and your talent. 
 
