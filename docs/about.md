@@ -61,7 +61,7 @@ The bus stop API consists of the following resources:
 
 All requests support [JSONP](http://json-p.org/) via the 'callback' parameter (eg. `?callback=foo`).
 
-<a id="get-bus-stopall"></a>
+<a id="get-bus-stops"></a>
 ### GET /bus-stops
 Return a list of bus stops within a given area (a bounding pox defined by two opposing points of a rectangle). 
 
@@ -72,7 +72,7 @@ Return a list of bus stops within a given area (a bounding pox defined by two op
 
 #### Example URL
 
-[`/bus-stops?northEast=51.52783450,-0.04076115&southWest=51.51560467,-0.10225884'`](http://lbi-id-test.herokuapp.com/bus-stops?northEast=51.52783450,-0.04076115&southWest=51.51560467,-0.10225884)
+[`/bus-stops?northEast=51.52783450,-0.04076115&southWest=51.51560467,-0.10225884'`](/bus-stops?northEast=51.52783450,-0.04076115&southWest=51.51560467,-0.10225884)
 
 #### 200 Response (ie. a successful request)
 
@@ -102,7 +102,7 @@ Return a list of bus stops within a given area (a bounding pox defined by two op
 
 
 
-<a id="get-bus-stopbus-stop-id"></a>
+<a id="get-bus-stopsbus-stop-id"></a>
 ### GET **/bus-stop/{bus-stop-id}**
 Retrieve a list of bus arrivals for a single stop
 
@@ -112,7 +112,7 @@ There are none.
 
 #### Example URL
 
-[`/bus-stop/58382`](http://lbi-id-test.herokuapp.com/bus-stops/58382)
+[`/bus-stop/58382`](/bus-stops/58382)
 
 
 
