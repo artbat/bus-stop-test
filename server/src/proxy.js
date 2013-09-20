@@ -32,7 +32,7 @@ module.exports.getMarkers = function (path, callback) {
 };
 
 module.exports.getArrivals = function (path, callback) {
-  var busStopNumber = path.replace(/^\/bus-stop\/([0-9])\/?/, '$1'); 
+  var busStopNumber = path.replace(/^\/bus-stops\/([0-9])\/?/, '$1'); 
 
   var isBusStopNumberMissing = typeof busStopNumber === 'undefined';
 

@@ -63,7 +63,7 @@ google.maps.event.addListenerOnce(map, 'idle', function(){
   // }
   function placeMarkers() {
     var bounds = map.getBounds();
-    var url = '/bus-stop/all?northEast='+bounds.getNorthEast().lat()+','+bounds.getNorthEast().lng()+
+    var url = '/bus-stops?northEast='+bounds.getNorthEast().lat()+','+bounds.getNorthEast().lng()+
               '&southWest='+bounds.getSouthWest().lat()+','+bounds.getSouthWest().lng();
     $.ajax({
       url: url,
@@ -79,7 +79,7 @@ google.maps.event.addListenerOnce(map, 'idle', function(){
           google.maps.event.addListener(marker, 'click', function() {
             
             $.ajax({
-              url: '/bus-stop/' + markerData.id, 
+              url: '/bus-stops/' + markerData.id, 
               success: function (arrivalsData) {
                 var content = '<h3>' + markerData.name + (markerData.stopIndicator ? ' ('+markerData.stopIndicator+')' : '') + '</h3>';
                 arrivalsData.arrivals.forEach(function (arrivals) {

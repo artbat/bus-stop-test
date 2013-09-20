@@ -144,7 +144,7 @@ pre, tt, code {
 /*--------------------- Layout ----------------------------*/
 
 .container {
-  width: 800px;
+  max-width: 800px;
   margin: 0 auto;
   background: #fff;
   overflow: hidden;

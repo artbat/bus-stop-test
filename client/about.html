@@ -20,7 +20,7 @@
 We're looking for talented developers who are passionate about HTML, CSS & JavaScript, who take pride in their code, and who want to build what's next-->
 
 <h2>Show us your skillz</h2>
-<p>From time to time in London you&#39;ll need to catch a bus. Some lucky bus stops have live departure boards, but not all do. To help,  we&#39;d like you to build an app to show live a departure board for any bus stop in London.</p>
+<p>From time to time in London you&#39;ll need to catch a bus. Some lucky bus stops have live departure boards, but not all do. To help, we&#39;d like you to build an app to show live a departure board for any bus stop in London.</p>
 <p>The task is designed to assess your interest and experience in front-end web development. We want to see your code, your approach, and your talent. </p>
 <h2>What you need to build</h2>
 <p>The minimum requirements for the bus departure board app are simply defined:</p>
@@ -42,18 +42,18 @@ We're looking for talented developers who are passionate about HTML, CSS & JavaS
 <p>If you&#39;re going to use an AJAX library, stick with <a href="http://jquery.com/">jQuery</a>.</p>
 <p>The bulk of your work will be finding bus stops and bus data. We&#39;ve written a simple <a href="#api">Bus stop API</a> using the <a href="http://www.tfl.gov.uk/businessandpartners/syndication/default.aspx">TFL bus data</a>  that will cover everything you&#39;ll need for your app. </p>
 <h2>When you&#39;re done</h2>
-<p>We expect most people to spend about an hour on this, although you&#39;re free to use more time if you want.</p>
+<p>We expect most people to spend between one to four hours on this task, although you&#39;re free to use more time if you want.</p>
 <p>Once you&#39;re done, you&#39;ll need to zip your code and send it to us, so make sure it can work when unzipped.</p>
 <p><a id="api"></a></p>
 <h2>Bus stop API</h2>
 <p>The bus stop API consists of the following resources:</p>
 <ol>
-<li><a href="#get-bus-stopall">/bus-stop/all</a></li>
-<li><a href="#get-bus-stopbus-stop-id">/bus-stop/{bus-stop-id}</a>  </li>
+<li><a href="#get-bus-stops">/bus-stops</a></li>
+<li><a href="#get-bus-stopsbus-stop-id">/bus-stops/{bus-stop-id}</a>  </li>
 </ol>
 <p>All requests support <a href="http://json-p.org/">JSONP</a> via the &#39;callback&#39; parameter (eg. <code>?callback=foo</code>).</p>
 <p><a id="get-bus-stopall"></a></p>
-<h3>GET /bus-stop/all</h3>
+<h3>GET /bus-stops</h3>
 <p>Return a list of bus stops within a given area (a bounding pox defined by two opposing points of a rectangle). </p>
 <h4>Required parameters</h4>
 <ul>
@@ -61,7 +61,7 @@ We're looking for talented developers who are passionate about HTML, CSS & JavaS
 <li><code>southWest={lat,long}</code> - the bottom-left geographical point of a bounding box, where lat and long are decimal values. </li>
 </ul>
 <h4>Example URL</h4>
-<p><a href="http://lbi-id-test.herokuapp.com/bus-stop/all?northEast=51.52783450,-0.04076115&amp;southWest=51.51560467,-0.10225884"><code>/bus-stop/all?northEast=51.52783450,-0.04076115&amp;southWest=51.51560467,-0.10225884&#39;</code></a></p>
+<p><a href="http://lbi-id-test.herokuapp.com/bus-stops?northEast=51.52783450,-0.04076115&amp;southWest=51.51560467,-0.10225884"><code>/bus-stops?northEast=51.52783450,-0.04076115&amp;southWest=51.51560467,-0.10225884&#39;</code></a></p>
 <h4>200 Response (ie. a successful request)</h4>
 
           
@@ -105,7 +105,7 @@ We're looking for talented developers who are passionate about HTML, CSS & JavaS
 <h4>Required parameters</h4>
 <p>There are none.</p>
 <h4>Example URL</h4>
-<p><a href="http://lbi-id-test.herokuapp.com/bus-stop/58382"><code>/bus-stop/58382</code></a></p>
+<p><a href="http://lbi-id-test.herokuapp.com/bus-stops/58382"><code>/bus-stop/58382</code></a></p>
 <h4>200 Response</h4>
 
         

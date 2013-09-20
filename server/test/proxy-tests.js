@@ -69,18 +69,18 @@ var sampleTflHtml = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//
 
 describe('TFL proxy', function () {
 
-  describe('/bus-stop/all', function () {    
+  describe('/bus-stops', function () {    
     
     it('should translate our bounding box lat lng format into tfl format', function (done) {
       var spy = sinon.spy(request, 'request');
-      proxy.getMarkers('/bus-stop/all?northEast=51.50874245880333,-0.2197265625&southWest=51.481382896100975,-0.263671875', function () {});
+      proxy.getMarkers('/bus-stops?northEast=51.50874245880333,-0.2197265625&southWest=51.481382896100975,-0.263671875', function () {});
       assert(spy.calledWithMatch('http://countdown.tfl.gov.uk/markers/swLat/51.481382896100975/swLng/-0.263671875/neLat/51.50874245880333/neLng/-0.2197265625/'));
       spy.restore();
       done();
     });
     
     it('should return a list of bus stops within a bounding box', function (done) {
-      var path = '/bus-stop/all?northEast=51.50874245880333,-0.2197265625&southWest=51.481382896100975,-0.263671875';
+      var path = '/bus-stops?northEast=51.50874245880333,-0.2197265625&southWest=51.481382896100975,-0.263671875';
       var stub = sinon.stub(request, 'request', function (path, callback) {
         callback(JSON.stringify(sampleBusStopsList));
       });
@@ -91,32 +91,32 @@ describe('TFL proxy', function () {
       });
     });
 
-    it('should send a 400 request if response from TFL isn\'t expected format', function (done) {
-      var path = '/bus-stop/all?northEast=51.50874245880333,-0.2197265625&southWest=51.481382896100975';
-      var stub = sinon.stub(request, 'request', function (path, callback) {
-        callback(JSON.stringify(sampleTflHtml));
-      });
-      proxy.getMarkers(path, function (data) {  
-        assert.deepEqual(data, sampleTflHtml);
-        done();
-        stub.restore();
-      });
-    });
+    // it('should send a 400 request if response from TFL isn\'t expected format', function (done) {
+    //   var path = '/bus-stops?northEast=51.50874245880333,-0.2197265625&southWest=51.481382896100975';
+    //   var stub = sinon.stub(request, 'request', function (path, callback) {
+    //     callback(JSON.stringify(sampleTflHtml));
+    //   });
+    //   proxy.getMarkers(path, function (data) {  
+    //     assert.deepEqual(data, sampleTflHtml);
+    //     done();
+    //     stub.restore();
+    //   });
+    // });
 
   });
 
-  describe('/bus-stop', function () {
+  describe('/bus-stops', function () {
 
     it('should translate our url to TFL url', function (done) {
       var spy = sinon.spy(request, 'request');
-      proxy.getArrivals('/bus-stop/58382', function () {});
+      proxy.getArrivals('/bus-stops/58382', function () {});
       assert(spy.calledWithMatch('http://countdown.tfl.gov.uk/stopBoard/58382'));
       spy.restore();
       done();
     });
 
     it('should return arrivals data', function (done) {
-      var path = '/bus-stop/58382';
+      var path = '/bus-stops/58382';
       var mock = sinon.stub(request, 'request', function (path, callback) {
         callback(JSON.stringify(sampleBusStopArrivals));
       });

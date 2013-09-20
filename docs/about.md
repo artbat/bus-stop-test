@@ -5,7 +5,7 @@
 We're looking for talented developers who are passionate about HTML, CSS & JavaScript, who take pride in their code, and who want to build what's next-->
 
 ## Show us your skillz
-From time to time in London you'll need to catch a bus. Some lucky bus stops have live departure boards, but not all do. To help,  we'd like you to build an app to show live a departure board for any bus stop in London.
+From time to time in London you'll need to catch a bus. Some lucky bus stops have live departure boards, but not all do. To help, we'd like you to build an app to show live a departure board for any bus stop in London.
 
 The task is designed to assess your interest and experience in front-end web development. We want to see your code, your approach, and your talent. 
 
@@ -45,7 +45,7 @@ The bulk of your work will be finding bus stops and bus data. We've written a si
 
 ## When you're done
 
-We expect most people to spend about an hour on this, although you're free to use more time if you want.
+We expect most people to spend between one to four hours on this task, although you're free to use more time if you want.
 
 Once you're done, you'll need to zip your code and send it to us, so make sure it can work when unzipped.
 
@@ -56,13 +56,13 @@ Once you're done, you'll need to zip your code and send it to us, so make sure i
 
 The bus stop API consists of the following resources:
 
-1. [/bus-stop/all](#get-bus-stopall)
-1. [/bus-stop/{bus-stop-id}](#get-bus-stopbus-stop-id)  
+1. [/bus-stops](#get-bus-stops)
+1. [/bus-stops/{bus-stop-id}](#get-bus-stopsbus-stop-id)  
 
 All requests support [JSONP](http://json-p.org/) via the 'callback' parameter (eg. `?callback=foo`).
 
 <a id="get-bus-stopall"></a>
-### GET /bus-stop/all
+### GET /bus-stops
 Return a list of bus stops within a given area (a bounding pox defined by two opposing points of a rectangle). 
 
 #### Required parameters
@@ -72,7 +72,7 @@ Return a list of bus stops within a given area (a bounding pox defined by two op
 
 #### Example URL
 
-[`/bus-stop/all?northEast=51.52783450,-0.04076115&southWest=51.51560467,-0.10225884'`](http://lbi-id-test.herokuapp.com/bus-stop/all?northEast=51.52783450,-0.04076115&southWest=51.51560467,-0.10225884)
+[`/bus-stops?northEast=51.52783450,-0.04076115&southWest=51.51560467,-0.10225884'`](http://lbi-id-test.herokuapp.com/bus-stops?northEast=51.52783450,-0.04076115&southWest=51.51560467,-0.10225884)
 
 #### 200 Response (ie. a successful request)
 
@@ -112,7 +112,7 @@ There are none.
 
 #### Example URL
 
-[`/bus-stop/58382`](http://lbi-id-test.herokuapp.com/bus-stop/58382)
+[`/bus-stop/58382`](http://lbi-id-test.herokuapp.com/bus-stops/58382)
 
 
 

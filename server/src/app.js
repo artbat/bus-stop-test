@@ -20,7 +20,21 @@ function initialiseStaticServer() {
 
 
 function initialiseRoutes() {
-  app.get('/bus-stop/all*', function(request, response) {
+
+  app.get('/bus-stops/*', function(request, response) {
+    proxy.getArrivals(request.url, function(jsonData, path) {
+      var queryStringParameters = url.parse(request.url, true).query;
+      var jsonpCallbackName = queryStringParameters.callback;
+      var isJsonP = typeof jsonpCallbackName !== 'undefined';
+      if (isJsonP) {
+        response.send(jsonpCallbackName + '(' +JSON.stringify(jsonData) + ')' );
+      } else {
+        response.json(jsonData);
+      }
+    });
+  });
+
+  app.get('/bus-stops*', function(request, response) {
     proxy.getMarkers(request.url, function(jsonData, path) {
 
       var isError = jsonData.hasOwnProperty('errorMessage');
@@ -40,18 +54,7 @@ function initialiseRoutes() {
     });
   });
 
-  app.get('/bus-stop/*', function(request, response) {
-    proxy.getArrivals(request.url, function(jsonData, path) {
-      var queryStringParameters = url.parse(request.url, true).query;
-      var jsonpCallbackName = queryStringParameters.callback;
-      var isJsonP = typeof jsonpCallbackName !== 'undefined';
-      if (isJsonP) {
-        response.send(jsonpCallbackName + '(' +JSON.stringify(jsonData) + ')' );
-      } else {
-        response.json(jsonData);
-      }
-    });
-  });
+  
 
 
   app.get('/', function (request, response) {
