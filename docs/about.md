@@ -3,7 +3,7 @@
 <!--
 
   Thanks for taking the time to peek at the source code. There's not all that much 
-  to see however, as this file was generated from a Markdown source file. 
+  to see, as this file was generated from a Markdown source file. 
 
   The Bus API we put together was a good deal of fun however, using Node.js goodness. 
   
