@@ -1,8 +1,16 @@
 # So you know HTML, CSS & JS?
 
-<!--DigitasLBi has one of the strongest front-end engineering lineups in London. We are passionate about innovating with web standards, best practice, emerging APIs, and are excited by the ever evolving modern front-end development stack: Git, Grunt, Node.js, Require.js, Bower, MV\* architectures, TDD, Responsive, *etc*.
+<!--
 
-We're looking for talented developers who are passionate about HTML, CSS & JavaScript, who take pride in their code, and who want to build what's next-->
+  Thanks for taking the time to peek at the source code. There's not all that much 
+  to see however, as this file was generated from a Markdown source file. 
+
+  The Bus API we put together was a good deal of fun however, using Node.js goodness. 
+  
+  Anyway, good luck with the test!
+
+ -->
+
 
 ## Show us your skillz
 From time to time in London you'll need to catch a bus. Some lucky bus stops have live departure boards, but not all do. To help, we'd like you to build an app to show a live departure board for any bus stop in London.
