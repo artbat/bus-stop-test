@@ -11,7 +11,7 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script>
 
-<!-- Not a particularly good example, but a more or less functional one-->
+// Not a particularly good example, but a more or less functional one
 
 
 var allMarkers = [];
@@ -35,17 +35,14 @@ function initialize() {
   var map = window.map = new google.maps.Map(document.getElementById('map-canvas'),
       mapOptions);
 
-google.maps.event.addListenerOnce(map, 'idle', function(){
-  placeMarkers();
-});
+  google.maps.event.addListenerOnce(map, 'idle', function(){
+    placeMarkers();
+  });
 
-  console.log('HI');
-
-  var foo;
-
+  var throttleTimer;
   google.maps.event.addListener(map, 'center_changed', function() {
-    clearTimeout(foo);
-    foo = setTimeout(function () {
+    clearTimeout(throttleTimer);
+    throttleTimer = setTimeout(function () {
       placeMarkers();
     }, 100);
   });
