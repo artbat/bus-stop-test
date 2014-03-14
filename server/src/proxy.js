@@ -6,6 +6,9 @@ var querystring = require('querystring');
 module.exports.getMarkers = function (path, callback) {
   var queryStringParams = url.parse(path, true).query;
   var isParameterMissing = (queryStringParams.hasOwnProperty('northEast') && queryStringParams.hasOwnProperty('southWest')) === false;
+  var northEast = queryStringParams.northEast.split(',');
+  var southWest = queryStringParams.southWest.split(',');
+  var tflUrl = 'http://countdown.tfl.gov.uk/markers/swLat/'+southWest[0]+'/swLng/'+southWest[1]+'/neLat/'+northEast[0]+'/neLng/'+northEast[1]+'/';
 
   if (isParameterMissing) {
     callback({
@@ -14,11 +17,6 @@ module.exports.getMarkers = function (path, callback) {
     return;
   } 
 
-  var northEast = queryStringParams.northEast.split(',');
-  var southWest = queryStringParams.southWest.split(',');
-
-
-  var tflUrl = 'http://countdown.tfl.gov.uk/markers/swLat/'+southWest[0]+'/swLng/'+southWest[1]+'/neLat/'+northEast[0]+'/neLng/'+northEast[1]+'/';
   request.request(tflUrl, function (data) {
     try {
       var rawData = JSON.parse(data);
@@ -33,9 +31,8 @@ module.exports.getMarkers = function (path, callback) {
 
 module.exports.getArrivals = function (path, callback) {
   var busStopNumber = path.replace(/^\/bus-stops\/([0-9])\/?/, '$1'); 
-
   var isBusStopNumberMissing = typeof busStopNumber === 'undefined';
-
+  
   if (isBusStopNumberMissing) {
     callback({
       errorMessage: 'You are missing a bus stop number'
