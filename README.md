@@ -1,3 +1,8 @@
 # About this project
 
-See the docs - note the docs are auto generated with docco - client/docs is a bit messy as a result. Needs some tidying.
+To get started:
+
+1. Run `npm install`
+2. Run `grunt`
+
+Grunt will open the browser, along with documentation about the test and the API specification.
