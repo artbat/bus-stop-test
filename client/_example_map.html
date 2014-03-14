@@ -4,11 +4,14 @@
     <title>ID test</title>
     <meta charset="utf-8">
     <link href="https://developers.google.com/maps/documentation/javascript/examples/default.css" rel="stylesheet">
-    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+  </head>
+  <body>
+    <div id="map-canvas"></div>
+       <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script>
 
-
+<!-- Not a particularly good example, but a more or less functional one-->
 
 
 var allMarkers = [];
@@ -32,12 +35,6 @@ function initialize() {
   var map = window.map = new google.maps.Map(document.getElementById('map-canvas'),
       mapOptions);
 
-  // var marker = new google.maps.Marker({
-  //   position: map.getCenter(),
-  //   map: map,
-  //   title: 'Click to zoom'
-  // });
-
 google.maps.event.addListenerOnce(map, 'idle', function(){
   placeMarkers();
 });
@@ -57,10 +54,6 @@ google.maps.event.addListenerOnce(map, 'idle', function(){
       content: 'Hello world'
   });
 
-  // map.getBoundz = function () {
-  //   var bounds = map.getBounds();
-  //   return 'http://countdown.tfl.gov.uk/markers/swLat/'+bounds.getSouthWest().lat()+'/swLng/'+bounds.getSouthWest().lng()+'/neLat/'+bounds.getNorthEast().lat()+'/neLng/'+bounds.getNorthEast().lng()+'/?_dc=1315778608026';
-  // }
   function placeMarkers() {
     var bounds = map.getBounds();
     var url = '/bus-stops?northEast='+bounds.getNorthEast().lat()+','+bounds.getNorthEast().lng()+
@@ -90,7 +83,6 @@ google.maps.event.addListenerOnce(map, 'idle', function(){
               }
             })
 
-            
           });
           allMarkers.push(marker);
         });
@@ -105,8 +97,5 @@ google.maps.event.addListenerOnce(map, 'idle', function(){
 google.maps.event.addDomListener(window, 'load', initialize);
 
     </script>
-  </head>
-  <body>
-    <div id="map-canvas"></div>
   </body>
 </html>
