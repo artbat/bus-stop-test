@@ -48,7 +48,7 @@ For your map, we recommend checking out the [Google Maps API](https://developers
 
 If you're going to use an AJAX library, stick with [jQuery](http://jquery.com/).
 
-The bulk of your work will be finding bus stops and bus data. We've written a simple [Bus stop API](#api) using the [TFL bus data](http://www.tfl.gov.uk/businessandpartners/syndication/default.aspx)  that will cover everything you'll need for your app. 
+The bulk of your work will be finding bus stops and bus data. We've written a simple [Bus stop API](#api) using the [TFL bus data](http://www.tfl.gov.uk/info-for/open-data-users/our-feeds?intcmp=4064#on-this-page-2)  that will cover everything you'll need for your app. 
 
 
 ## When you're done
@@ -111,7 +111,7 @@ Return a list of bus stops within a given area (a bounding pox defined by two op
 
 
 <a id="get-bus-stopsbus-stop-id"></a>
-### GET **/bus-stop/{bus-stop-id}**
+### GET **/bus-stops/{bus-stop-id}**
 Retrieve a list of bus arrivals for a single stop
 
 #### Required parameters
@@ -120,7 +120,7 @@ There are none.
 
 #### Example URL
 
-[`/bus-stop/58382`](/bus-stops/58382)
+[`/bus-stops/58382`](/bus-stops/58382)
 
 
 
