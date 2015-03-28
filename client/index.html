@@ -10,16 +10,15 @@
     <div id="map-canvas"></div>
     <div id="bus-stop-departures"></div>
 
-    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-
-    <script type='text/javascript' src="public/js/vendor/class.js"></script>
-
+    <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <script type='text/javascript' src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script type='text/javascript' src="http://underscorejs.org/underscore.js"></script>
     <script type='text/javascript' src="http://backbonejs.org/backbone.js"></script>
     <script type='text/javascript' src="http://marionettejs.com/downloads/backbone.marionette.js"></script>
     <script type='text/javascript' src="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.1.0/bootstrap.min.js"></script>
     <script type='text/javascript' src="http://cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"></script>
+
+    <script type='text/javascript' src="public/js/vendor/class.js"></script>
 
     <!--<link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">-->
     <script>
@@ -55,13 +54,14 @@
       });
 
       var Model = Class.extend({
-        currBusStop: null, //58382,
+        currBusStop: null,
         lastUpdated: undefined,
 
-        arrivals:    new RouteArrivals(),
-        departures:  new RouteDepartures(),
+        arrivals:    new RouteArrivals(),       //Collection holding raw bus stop API results
+        departures:  new RouteDepartures(),     //Collection for processed arrivals data, bindable on view
 
         initialize: function () {
+          //Custom parsing before injecting response from /bus-stops/<id>
           this.arrivals.parse = this.onParseArrivals.bind(this);
         },
 
@@ -69,12 +69,40 @@
           var self = this;
 
           if(self.currBusStop){
+            //Setting up REST API URL to current model's bus stop
             self.arrivals.url = "/bus-stops/" + self.currBusStop;
+
+            //Request to the persistence layer for updates. By default a REST API.
             self.arrivals.fetch({
               dataType: "jsonp",
 
-              success: function(collection, response, options){
+              success: function (collection, response, options) {
                 console.log("refrescado!!");
+
+                //Setting up app's current time based on server response, instead of local time. That makes it time-zone
+                // independent, avoiding Madrid/London differences
+                self.lastUpdated = self.parseTime(response["lastUpdated"]);
+
+                var groups = collection.groupBy("routeId");
+
+                var departures =
+                  _.chain(groups)
+                  .keys()
+                  .map(function (routeId) {
+                    var routeData = collection.findWhere({"routeId": routeId});
+                    return {
+                      "routeId":       routeId,
+                      "routeName":     routeData.get("routeName"),
+                      "destination":   routeData.get("destination"),
+                      "scheduledTime": groups[routeId][0].get(["scheduledTime"]),
+                      "departures":    groups[routeId]
+                    }
+                  })
+                  .sortBy("scheduledTime")
+                  .value();
+
+                //Smart update of departures
+                self.departures.set(departures);
               },
 
               error: function(err){
@@ -87,19 +115,19 @@
         onParseArrivals: function (response) {
           var self = this;
 
-          //UUID creation for the models in the collection. Needed for smart updates later on
           _(response["arrivals"]).each(function (arrival) {
+            //UUID creation for the models in the collection. Needed for smart updates later on
             arrival.id = arrival["routeId"] + "_" + arrival["scheduledTime"]; //.split(":").join("_");
+
+            //Parsing arrival time from string to integer timestamp
             arrival.scheduledTime = self.parseTime(arrival["scheduledTime"]);
           });
 
-          //Setting up other model properties
-          self.lastUpdated = self.parseTime(response["lastUpdated"]);
-
-          //Returning parsed data
+          //Returning parsed data to the collection
           return response["arrivals"];
         },
 
+        //Transforms a time string for the API, like "[day ]hh:mm" string in an absolute integer timestamp
         parseTime: function(timeString){
           var now = new Date();
           var minutesAndSeconds = timeString.split(":");
