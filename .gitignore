@@ -11,8 +11,6 @@ bower_components
 node_modules
 build
 src/js/templates.js
-process.bat
-process.sh
 Thumbs.db
 **/Thumbs.db
 src/js/modules/*

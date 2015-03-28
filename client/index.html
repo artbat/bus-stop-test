@@ -8,40 +8,33 @@
   </head>
   <body>
     <div id="map-canvas"></div>
-    <div id="next-departures"></div>
+    <div id="bus-stop-departures"></div>
+
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+    <script type='text/javascript' src="public/js/vendor/class.js"></script>
 
     <script type='text/javascript' src="http://underscorejs.org/underscore.js"></script>
     <script type='text/javascript' src="http://backbonejs.org/backbone.js"></script>
     <script type='text/javascript' src="http://marionettejs.com/downloads/backbone.marionette.js"></script>
     <script type='text/javascript' src="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.1.0/bootstrap.min.js"></script>
-    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"></script>
+    <script type='text/javascript' src="http://cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"></script>
 
     <!--<link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">-->
     <script>
       var busStopApp = new Marionette.Application();
 
       busStopApp.addRegions({
-        nextDepartures: "#next-departures"
+        busStopDepartures: "#bus-stop-departures"
       });
 
       var RouteArrival = Backbone.Model.extend({
         defaults:{
-          "routeId":       null,
-          "routeName":     null,
-          "destination":   null,
-          "scheduledTime": null
-        }
-      });
-
-      var RouteArrivals = Backbone.Collection.extend({
-        model: RouteArrival,
-        url: "http://localhost:5000/bus-stops/58382",
-
-        parse: function(response){
-          console.log(response);
-          return response["arrivals"];
+          "routeId":       undefined,
+          "routeName":     undefined,
+          "destination":   undefined,
+          "scheduledTime": undefined
         }
       });
 
@@ -52,8 +45,72 @@
         }
       });
 
+      var RouteArrivals = Backbone.Collection.extend({
+        model: RouteArrival,
+        url: "/bus-stops/"
+      });
+
       var RouteDepartures = Backbone.Collection.extend({
         model: RouteDeparture
+      });
+
+      var Model = Class.extend({
+        currBusStop: null, //58382,
+        lastUpdated: undefined,
+
+        arrivals:    new RouteArrivals(),
+        departures:  new RouteDepartures(),
+
+        initialize: function () {
+          this.arrivals.parse = this.onParseArrivals.bind(this);
+        },
+
+        refresh: function(){
+          var self = this;
+
+          if(self.currBusStop){
+            self.arrivals.url = "/bus-stops/" + self.currBusStop;
+            self.arrivals.fetch({
+              dataType: "jsonp",
+
+              success: function(collection, response, options){
+                console.log("refrescado!!");
+              },
+
+              error: function(err){
+
+              }
+            })
+          }
+        },
+
+        onParseArrivals: function (response) {
+          var self = this;
+
+          //UUID creation for the models in the collection. Needed for smart updates later on
+          _(response["arrivals"]).each(function (arrival) {
+            arrival.id = arrival["routeId"] + "_" + arrival["scheduledTime"]; //.split(":").join("_");
+            arrival.scheduledTime = self.parseTime(arrival["scheduledTime"]);
+          });
+
+          //Setting up other model properties
+          self.lastUpdated = self.parseTime(response["lastUpdated"]);
+
+          //Returning parsed data
+          return response["arrivals"];
+        },
+
+        parseTime: function(timeString){
+          var now = new Date();
+          var minutesAndSeconds = timeString.split(":");
+          var minutes = minutesAndSeconds[0];
+          var seconds = minutesAndSeconds[1];
+          var day = now.getUTCDay();
+
+          if(minutes.indexOf(" ") > -1){ minutes = minutes.split(" ")[1]; day++; }
+          return Date.UTC(now.getFullYear(), now.getUTCMonth(), day, minutes, seconds);
+        }
+
       });
 
       busStopApp.start();
