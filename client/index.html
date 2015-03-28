@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ID test</title>
+    <meta charset="utf-8">
+    <link href="https://developers.google.com/maps/documentation/javascript/examples/default.css" rel="stylesheet">
+    <link href="test.css" rel="stylesheet">
+  </head>
+  <body>
+    <div id="map-canvas"></div>
+    <div id="next-departures"></div>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+    <script type='text/javascript' src="http://underscorejs.org/underscore.js"></script>
+    <script type='text/javascript' src="http://backbonejs.org/backbone.js"></script>
+    <script type='text/javascript' src="http://marionettejs.com/downloads/backbone.marionette.js"></script>
+    <script type='text/javascript' src="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.1.0/bootstrap.min.js"></script>
+    <script type='text/javascript' src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"></script>
+
+    <!--<link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">-->
+    <script>
+      var busStopApp = new Marionette.Application();
+
+      busStopApp.addRegions({
+        nextDepartures: "#next-departures"
+      });
+
+      var RouteArrival = Backbone.Model.extend({
+        defaults:{
+          "routeId":       null,
+          "routeName":     null,
+          "destination":   null,
+          "scheduledTime": null
+        }
+      });
+
+      var RouteArrivals = Backbone.Collection.extend({
+        model: RouteArrival,
+        url: "http://localhost:5000/bus-stops/58382",
+
+        parse: function(response){
+          console.log(response);
+          return response["arrivals"];
+        }
+      });
+
+      var RouteDeparture = RouteArrival.extend({
+        idAttribute: "routeId",
+        defaults:{
+          "departures": []
+        }
+      });
+
+      var RouteDepartures = Backbone.Collection.extend({
+        model: RouteDeparture
+      });
+
+      busStopApp.start();
+
+    </script>
+  </body>
+</html>
