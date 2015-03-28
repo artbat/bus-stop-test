@@ -37,6 +37,11 @@
         }
       });
 
+      var RouteArrivals = Backbone.Collection.extend({
+        model: RouteArrival,
+        url: "/bus-stops/"
+      });
+
       var RouteDeparture = RouteArrival.extend({
         idAttribute: "routeId",
         defaults:{
@@ -44,18 +49,13 @@
         }
       });
 
-      var RouteArrivals = Backbone.Collection.extend({
-        model: RouteArrival,
-        url: "/bus-stops/"
-      });
-
       var RouteDepartures = Backbone.Collection.extend({
         model: RouteDeparture
       });
 
       var Model = Class.extend({
-        currBusStop: null,
-        lastUpdated: undefined,
+        _currBusStop: null,
+        _lastUpdated: undefined,
 
         arrivals:    new RouteArrivals(),       //Collection holding raw bus stop API results
         departures:  new RouteDepartures(),     //Collection for processed arrivals data, bindable on view
@@ -63,6 +63,11 @@
         initialize: function () {
           //Custom parsing before injecting response from /bus-stops/<id>
           this.arrivals.parse = this.onParseArrivals.bind(this);
+        },
+
+        reset: function(){
+          this.arrivals.reset();
+          this.departures.reset();
         },
 
         refresh: function(){
@@ -79,12 +84,12 @@
               success: function (collection, response, options) {
                 console.log("refrescado!!");
 
-                //Setting up app's current time based on server response, instead of local time. That makes it time-zone
-                // independent, avoiding Madrid/London differences
-                self.lastUpdated = self.parseTime(response["lastUpdated"]);
+                //Setting up app's current time based on server response, instead of local time.
+                // That makes it time-zone independent, avoiding Madrid/London differences
+                self._lastUpdated = self.parseTime(response["lastUpdated"]);
 
+                //Processing arrivals in order to generate the model to departures
                 var groups = collection.groupBy("routeId");
-
                 var departures =
                   _.chain(groups)
                   .keys()
@@ -138,6 +143,31 @@
           if(minutes.indexOf(" ") > -1){ minutes = minutes.split(" ")[1]; day++; }
           return Date.UTC(now.getFullYear(), now.getUTCMonth(), day, minutes, seconds);
         }
+
+      });
+
+      Object.defineProperty(Model.prototype, "currBusStop", {
+        get: function () {
+          return this._currBusStop;
+        },
+        set: function(str){
+          if (str !== this._currBusStop) {
+            this._currBusStop = str;
+            this.reset();
+            this.refresh();
+          }
+        },
+        enumerable: true,
+        configurable: true
+      });
+
+
+      var ArrivalView = Marionette.ItemView.extend({
+
+      });
+
+      var ArrivalsView = Marionette.CollectionView.extend({
+        childView: ArrivalView
 
       });
 
