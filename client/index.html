@@ -34,6 +34,25 @@
     <script type="text/javascript">
       var app = new Marionette.Application();
 
+      var BusStop = Backbone.Model.extend({
+        idAttribute: "id",
+        defaults:{
+          "smsCode": undefined,
+          "name": undefined,
+          "stopIndicator": undefined,
+          "towards": undefined,
+          "direction": undefined,
+          "lat": undefined,
+          "lng": undefined,
+          "routes": []
+        }
+      });
+
+      var BusStops = Backbone.Collection.extend({
+        model: BusStop,
+        url: "/bus-stops/?northEast={lat},{long}&southWest={lat},{long}"
+      });
+
       var RouteArrival = Backbone.Model.extend({
         defaults:{
           "routeId":       undefined,
@@ -45,7 +64,7 @@
 
       var RouteArrivals = Backbone.Collection.extend({
         model: RouteArrival,
-        url: "/bus-stops/"
+        url: "/bus-stops/{id}"
       });
 
       var RouteDeparture = RouteArrival.extend({
@@ -61,12 +80,13 @@
       });
 
       var Model = Class.extend({
-        _currBusStop:         null,
-        _lastUpdated:         undefined,
-        _lastUpdatedAsString: undefined,
+        _currBusStop:        null,
+        _lastUpdated:        undefined,
+        lastUpdatedAsString: undefined,
 
-        arrivals:    new RouteArrivals(),       //Collection holding raw bus stop API results
-        departures:  new RouteDepartures(),     //Collection for processed arrivals data, bindable
+        busStops:    new BusStops(),            //Collection of bus stops
+        arrivals:    new RouteArrivals(),       //Collection holding raw bus stop arrivals API results
+        departures:  new RouteDepartures(),     //Collection for processed arrivals data, bindable in view
 
         initialize: function () {
           //Custom parsing before injecting response from /bus-stops/<id>
@@ -83,8 +103,8 @@
           if(typeof onError !== "function") onError = function(){};
 
           var self = this;
-
           if(self.currBusStop){
+
             //Setting up REST API URL to current model's bus stop
             self.arrivals.url = "/bus-stops/" + self.currBusStop;
 
@@ -93,15 +113,16 @@
               dataType: "jsonp",
 
               success: function(arrivals, response, options) {
-                //Setting up app's current time, based on server response instead of local time.
-                // This makes the app time-zone independent, avoiding Madrid/London differences
+
+                //Sets up app's current time, based on server response instead of local time. This makes the app
+                // time-zone independent, avoiding Madrid/London differences
                 self._lastUpdated = self.parseTime(response["lastUpdated"]);
-                self._lastUpdatedAsString = response["lastUpdated"];
+                self.lastUpdatedAsString = response["lastUpdated"];
 
                 //Groups arrivals by route. There exist 1-N arrivals for each route
                 var groups = arrivals.groupBy("routeId");
 
-                //Picks first arrival instance of every route and nests the rest in "nextDepartures" property
+                //For each group picks the first arrival (they're time sorted) and nests the rest in the "nextDepartures" property
                 var departures =
                   _.chain(groups)
                   .keys()
@@ -120,7 +141,7 @@
                   .sortBy("scheduledTime")
                   .value();
 
-                //Smart update of previous departures with these newly processed ones
+                //Smart updates previous departures with the new ones
                 self.departures.set(departures);
 
                 console.log("model.refresh() SUCCESS!");
@@ -234,6 +255,8 @@
         app.departures.show(app.view);
 
         app.model.currBusStop = 73044;
+
+        setInterval(app.model.refresh, 30 * 1000);
       });
 
       app.start();
