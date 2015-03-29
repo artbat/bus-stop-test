@@ -46,6 +46,8 @@
 
       var app = new Marionette.Application();
 
+      //Constructor for a Backbone Model that holds a single bus stop data
+      //--------------------------------------------------------------------
       var BusStop = Backbone.Model.extend({
         idAttribute: "id",
         defaults:{
@@ -60,11 +62,15 @@
         }
       });
 
+      //Constructor for a Backbone Collection of bus stops. It feeds from the REST API
+      //-------------------------------------------------------------------------------
       var BusStops = Backbone.Collection.extend({
         model: BusStop,
         url: "/bus-stops/?northEast={neLat},{neLong}&southWest={swLat},{swLong}"
       });
 
+      //Constructor for a Backbone Model that holds a single route arrival data
+      //-------------------------------------------------------------------------
       var RouteArrival = Backbone.Model.extend({
         defaults:{
           "routeId":       undefined,
@@ -74,11 +80,16 @@
         }
       });
 
+      //Constructor for a Backbone Collection of route arrivals. It feeds from the REST API
+      //------------------------------------------------------------------------------------
       var RouteArrivals = Backbone.Collection.extend({
         model: RouteArrival,
         url: "/bus-stops/{id}"
       });
 
+      //Constructor for a Backbone Model that holds a single departure data.
+      //  Inherits from RouteArrival, adding a subcollection for the next arrivals of the same route.
+      //----------------------------------------------------------------------------------------------
       var RouteDeparture = RouteArrival.extend({
         idAttribute: "routeId",
         defaults:{
@@ -86,21 +97,26 @@
         }
       });
 
+      //Constructor for a Backbone Collection of route arrivals.
+      // It feeds from the processing of the RouteArrivals collection, grouping arrivals by route
+      //-------------------------------------------------------------------------------------------
       var RouteDepartures = Backbone.Collection.extend({
         model: RouteDeparture,
         sync: null
       });
 
+      //Main app's model (in MVC terms, not Backbone terms)
+      //-----------------------------------------------------
       var Model = Class.extend({
-        _currBusStop:        null,
-        _lastUpdated:        undefined,
-        lastUpdatedAsString: undefined,
+        _currBusStop:        null,              //Current bus stop ID
+        _lastUpdated:        undefined,         //Timestamp of last update
+        lastUpdatedAsString: undefined,         //String "hh:mm" of last update
 
         busStops:    new BusStops(),            //Collection of bus stops
         arrivals:    new RouteArrivals(),       //Collection holding raw bus stop arrivals API results
         departures:  new RouteDepartures(),     //Collection for processed arrivals data, bindable in view
 
-        initialize: function () {
+        initialize: function() {
           //Custom parsing before injecting response from /bus-stops/<id>
           this.arrivals.parse = this.onParseArrivals.bind(this);
         },
@@ -239,6 +255,8 @@
       });
 
 
+      //Constructor for the view of a single bus stop's departure.
+      //-------------------------------------------------------------
       var DepartureView = Marionette.ItemView.extend({
         template: Handlebars.compile($("#departure-template").html()),
         tagName: "item",
@@ -249,6 +267,9 @@
         }
       });
 
+      //Constructor for the view of the collection of bus stop's departures.
+      // It will be binded to a collection of RouteDepartures
+      //---------------------------------------------------------------------
       var DeparturesView = Marionette.CollectionView.extend({
         childView: DepartureView
       });
