@@ -9,7 +9,20 @@
     <link href="test.css" rel="stylesheet">
   </head>
   <body>
+    <div id="title-bar">
+      <div class="title">Countdown</div>
+      <div class="button-refresh"><a id="button-refresh" href="#">C</a></div>
+    </div>
+
+    <div class="stop-header">
+      <div class="stop-indicator" id="stop-indicator">P</div>
+      <div class="stop-name" id="stop-name">Baltic Street West</div>
+      <div class="stop-towards" id="stop-towards">Aldwych, Finsbury Square or St Barts Hospital</div>
+      <div class="button-go-here"><a id="button-go-here" href="#">O</a></div>
+    </div>
+
     <div id="map-canvas"></div>
+
     <div id="route-departures"></div>
 
     <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
@@ -22,12 +35,11 @@
 
     <script type='text/javascript' src="public/js/vendor/class.js"></script>
 
-    <!--<script type="text/template" id="departure-template">
-      <p><%- routeName %> <%- destination %> <%- nextDepartures.length %></p>
-    </script>-->
-
     <script id="departure-template" type="text/x-handlebars-template">
-      <p>{{routeName}} {{destination}} ({{estimatedWait}}) {{nextDepartures.length}} {{showNextDepartures nextDepartures}}</p>
+      <div class="name">{{routeName}}</div>
+      <div class="destination">{{destination}}</div>
+      <div class="arrival">{{estimatedWait}}</div>
+      <div class="next-departures">{{showNextDepartures nextDepartures}}</div>
     </script>
 
     <script type="text/javascript">
@@ -241,10 +253,18 @@
         childView: DepartureView
       });
 
+      //Returns next route departures collection in a properly formatted string
       Handlebars.registerHelper('showNextDepartures',
         function(departuresCollection) {
-          var str = "then ";
-          return "OW!";
+          var str = "";
+          if(departuresCollection.length > 0){
+            str += "then ";
+            str += departuresCollection.map(function(model){
+              return model.get("estimatedWait").split(" ")[0]
+            }).join(", ");
+            str += " min";
+          }
+          return str;
         }
       );
 

@@ -1,37 +1,89 @@
 body {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-weight: bolder;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: bolder;
+  color: #000000;
 }
 
-.stop-header {
-    background: red;
-    color: white;
+#title-bar {
+  color: black;
+  height: 2em;
+  font-size: 1.5em;
+}
+
+#stop-header {
+  background: red;
+  color: white;
+  height: 3.5em;
 }
 
 #map-canvas {
-    height: 50%;
-    margin: 0px;
-    padding: 0px
-}
-
-#nextArrivals {
-    margin: 0px;
-    padding: 0px;
-}
-
-
-#route-departures {
+  height: 50%;
+  margin: 0px;
+  padding: 0px
 }
 
 #last-refresh {
-    background: red;
-    color: white;
+  background: red;
+  color: white;
 }
 
-#route-departures div .route {
- font-size: 1.25em;
+#route-departures {
+  height: 50%;
+  margin: 0px;
+  padding: 0px;
+  /*position: relative;*/
 }
+
+  #route-departures div {
+    font-size: 1.25em;
+    /*position: inherit;*/
+  }
 
     #route-departures div .route {
-        font-size: 1.25em;
+      width: 100%;
+      /*position: inherit;*/
+      height: 100%;
+      display: inline-block;
     }
+
+      #route-departures div .route .name {
+        /*position: absolute;*/
+        /*background: lightblue;*/
+        width: auto;
+        top: 0;
+        left: 0;
+        color: red;
+        /*display: none;*/
+      }
+
+      #route-departures div .route .destination {
+        /*position: absolute;*/
+        /*background: lightgreen;*/
+        width: auto;
+        left: 0;
+        bottom: 0;
+        font-size: 0.75em;
+        color: lightgrey;
+        /*display: none;*/
+      }
+
+      #route-departures div .route .arrival {
+        /*position: absolute;*/
+        /*background: lightgoldenrodyellow;*/
+        width: auto;
+        top: 0;
+        right: 0;
+        font-size: 1.25em;
+        /*display: none;*/
+      }
+
+      #route-departures div .route .next-departures {
+        /*position: absolute;*/
+        /*background: lightcoral;*/
+        width: auto;
+        bottom: 0;
+        right: 0;
+        font-size: 0.75em;
+        color: darkgrey;
+        /*display: block;*/
+      }
