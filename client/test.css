@@ -1,10 +1,37 @@
-      #map-canvas {
-        height: 50%;
-        margin: 0px;
-        padding: 0px
-      }
-      #nextArrivals {
-        height: 50%;
-        margin: 0px;
-        padding: 0px
-      }
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: bolder;
+}
+
+.stop-header {
+    background: red;
+    color: white;
+}
+
+#map-canvas {
+    height: 50%;
+    margin: 0px;
+    padding: 0px
+}
+
+#nextArrivals {
+    margin: 0px;
+    padding: 0px;
+}
+
+
+#route-departures {
+}
+
+#last-refresh {
+    background: red;
+    color: white;
+}
+
+#route-departures div .route {
+ font-size: 1.25em;
+}
+
+    #route-departures div .route {
+        font-size: 1.25em;
+    }
