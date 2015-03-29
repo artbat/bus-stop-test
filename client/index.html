@@ -4,11 +4,13 @@
     <title>ID test</title>
     <meta charset="utf-8">
     <link href="https://developers.google.com/maps/documentation/javascript/examples/default.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
     <link href="test.css" rel="stylesheet">
   </head>
   <body>
     <div id="map-canvas"></div>
-    <div id="bus-stop-departures"></div>
+    <div id="route-departures"></div>
 
     <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
     <script type='text/javascript' src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
@@ -25,11 +27,10 @@
     </script>-->
 
     <script id="departure-template" type="text/x-handlebars-template">
-      <p>{{routeName}} {{destination}} {{nextDepartures.length}}</p>
+      <p>{{routeName}} {{destination}} ({{estimatedWait}}) {{nextDepartures.length}}</p>
     </script>
 
 
-    <!--<link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">-->
     <script type="text/javascript">
       var app = new Marionette.Application();
 
@@ -60,8 +61,9 @@
       });
 
       var Model = Class.extend({
-        _currBusStop: null,
-        _lastUpdated: undefined,
+        _currBusStop:         null,
+        _lastUpdated:         undefined,
+        _lastUpdatedAsString: undefined,
 
         arrivals:    new RouteArrivals(),       //Collection holding raw bus stop API results
         departures:  new RouteDepartures(),     //Collection for processed arrivals data, bindable
@@ -94,6 +96,7 @@
                 //Setting up app's current time, based on server response instead of local time.
                 // This makes the app time-zone independent, avoiding Madrid/London differences
                 self._lastUpdated = self.parseTime(response["lastUpdated"]);
+                self._lastUpdatedAsString = response["lastUpdated"];
 
                 //Groups arrivals by route. There exist 1-N arrivals for each route
                 var groups = arrivals.groupBy("routeId");
@@ -219,7 +222,7 @@
 
       app.on("start", function () {
         app.addRegions({
-          departures: "#bus-stop-departures"
+          departures: "#route-departures"
         });
 
         app.model = new Model();
@@ -231,8 +234,6 @@
         app.departures.show(app.view);
 
         app.model.currBusStop = 73044;
-        app.model.refresh(function () {
-        });
       });
 
       app.start();
