@@ -10,14 +10,14 @@ body {
   font-size: 1.5em;
 }
 
-#stop-header {
+#bus-stop-header {
   background: red;
   color: white;
   height: 3.5em;
 }
 
 #map-canvas {
-  height: 50%;
+  height: 30%;
   margin: 0px;
   padding: 0px
 }
@@ -28,7 +28,6 @@ body {
 }
 
 #route-departures {
-  height: 50%;
   margin: 0px;
   padding: 0px;
   /*position: relative;*/
