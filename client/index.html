@@ -9,15 +9,15 @@
     <link href="test.css" rel="stylesheet">
   </head>
   <body>
-    <div id="title-bar">
+    <div id="title-bar" class="title-bar">
       <div class="title">Countdown</div>
       <div class="button-refresh"><a id="button-refresh" href="#">C</a></div>
     </div>
 
-    <div class="stop-header">
-      <div class="stop-indicator" id="stop-indicator">P</div>
-      <div class="stop-name" id="stop-name">Baltic Street West</div>
-      <div class="stop-towards" id="stop-towards">Aldwych, Finsbury Square or St Barts Hospital</div>
+    <div id="stop-header" class="stop-header">
+      <div class="stop-indicator" id="stop-indicator"></div>
+      <div class="stop-name" id="stop-name">Haymarket</div>
+      <div class="stop-towards" id="stop-towards">towards Aldwych, Finsbury Square or St Barts Hospital</div>
       <div class="button-go-here"><a id="button-go-here" href="#">O</a></div>
     </div>
 
@@ -27,11 +27,11 @@
 
     <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
     <script type='text/javascript' src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-    <script type='text/javascript' src="http://underscorejs.org/underscore.js"></script>
-    <script type='text/javascript' src="http://backbonejs.org/backbone.js"></script>
-    <script type='text/javascript' src="http://marionettejs.com/downloads/backbone.marionette.js"></script>
-    <script type='text/javascript' src="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.1.0/bootstrap.min.js"></script>
-    <script type='text/javascript' src="http://cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"></script>
+    <script type='text/javascript' src="public/js/vendor/underscore.js"></script>
+    <script type='text/javascript' src="public/js/vendor/backbone.js"></script>
+    <script type='text/javascript' src="public/js/vendor/backbone.marionette.js"></script>
+    <script type='text/javascript' src="public/js/vendor/bootstrap.min.js"></script>
+    <script type='text/javascript' src="public/js/vendor/handlebars.min.js"></script>
 
     <script type='text/javascript' src="public/js/vendor/class.js"></script>
 
@@ -62,15 +62,14 @@
         }
       });
 
-      //Constructor for a Backbone Collection of bus stops. It feeds from the REST API
+      //Backbone Collection Constructor for bus stops. It feeds from the REST API
       //-------------------------------------------------------------------------------
       var BusStops = Backbone.Collection.extend({
-        model: BusStop,
-        url: "/bus-stops/?northEast={neLat},{neLong}&southWest={swLat},{swLong}"
+        model: BusStop
       });
 
-      //Constructor for a Backbone Model that holds a single route arrival data
-      //-------------------------------------------------------------------------
+      //Backbone Model Constructor representing a single route arrival
+      //-----------------------------------------------------------
       var RouteArrival = Backbone.Model.extend({
         defaults:{
           "routeId":       undefined,
@@ -80,15 +79,15 @@
         }
       });
 
-      //Constructor for a Backbone Collection of route arrivals. It feeds from the REST API
+      //Backbone Collection Constructor for route arrivals. It feeds from the REST API
       //------------------------------------------------------------------------------------
       var RouteArrivals = Backbone.Collection.extend({
         model: RouteArrival,
         url: "/bus-stops/{id}"
       });
 
-      //Constructor for a Backbone Model that holds a single departure data.
-      //  Inherits from RouteArrival, adding a subcollection for the next arrivals of the same route.
+      //Backbone Model Constructor representing a single departure data.
+      //  Inherits from RouteArrival, adding a sub-collection for the next arrivals of the same route
       //----------------------------------------------------------------------------------------------
       var RouteDeparture = RouteArrival.extend({
         idAttribute: "routeId",
@@ -97,7 +96,7 @@
         }
       });
 
-      //Constructor for a Backbone Collection of route arrivals.
+      //Constructor for a Backbone Collection of route arrivals. Binded to the view.
       // It feeds from the processing of the RouteArrivals collection, grouping arrivals by route
       //-------------------------------------------------------------------------------------------
       var RouteDepartures = Backbone.Collection.extend({
@@ -111,14 +110,21 @@
         _currBusStop:        null,              //Current bus stop ID
         _lastUpdated:        undefined,         //Timestamp of last update
         lastUpdatedAsString: undefined,         //String "hh:mm" of last update
+        map:                 null,              //App's google map
 
         busStops:    new BusStops(),            //Collection of bus stops
         arrivals:    new RouteArrivals(),       //Collection holding raw bus stop arrivals API results
         departures:  new RouteDepartures(),     //Collection for processed arrivals data, bindable in view
 
         initialize: function() {
-          //Custom parsing before injecting response from /bus-stops/<id>
+          //Custom parsing before injecting API responses into collections
           this.arrivals.parse = this.onParseArrivals.bind(this);
+          this.busStops.parse = this.onParseMarkers.bind(this);
+
+          //Bus stop collection event handlers --> Map markers management
+          this.busStops.on("add", this.onMarkerAdd.bind(this));
+          this.busStops.on("remove", this.onMarkerRemove.bind(this));
+          this.busStops.on("reset", this.onMarkersReset.bind(this));
         },
 
         reset: function(){
@@ -126,7 +132,7 @@
           this.departures.reset();
         },
 
-        refresh: function(onSuccess, onError){
+        refreshDepartures: function(onSuccess, onError){
           if(typeof onSuccess !== "function") onSuccess = function(){};
           if(typeof onError !== "function") onError = function(){};
 
@@ -172,12 +178,12 @@
                 //Smart updates previous departures with the new ones
                 self.departures.set(departures);
 
-                console.log("model.refresh() SUCCESS!");
+                console.log("model.refreshDepartures() SUCCESS!");
                 onSuccess();
               },
 
               error: function(err){
-                console.log("model.refresh() ERROR -->"); console.log(err);
+                console.log("model.refreshDepartures() ERROR -->"); console.log(err);
                 onError(err);
               }
             })
@@ -186,8 +192,55 @@
           }
         },
 
+        refreshBusStops: function(onSuccess, onError){
+          if(typeof onSuccess !== "function") onSuccess = function(){};
+          if(typeof onError !== "function") onError = function(){};
+
+          var self = this;
+          var bounds = self.map.getBounds();
+
+          //Request to the persistence layer for updates. By default a REST API.
+          self.busStops.url = '/bus-stops?' +
+            'northEast='+bounds.getNorthEast().lat()+','+bounds.getNorthEast().lng() + '&' +
+            'southWest='+bounds.getSouthWest().lat()+','+bounds.getSouthWest().lng();
+
+          self.busStops.fetch({
+            dataType: "jsonp",
+
+            success: function(arrivals, response, options) {
+              console.log("model.refreshBusStops() SUCCESS!");
+              onSuccess();
+            },
+
+            error: function(err){
+              console.log("model.refreshDepartures() ERROR -->"); console.log(err);
+              onError(err);
+            }
+          });
+          /*$.ajax({
+            url: self.busStops.url,
+            success: function (data) {
+              console.log("hola!")
+            }
+          })*/
+        },
+
+        onMarkerAdd: function(model, collection, options){
+          console.log("onMarkerAdd()");
+        },
+
+        onMarkerRemove: function(model, collection, options){
+          console.log("onMarkerRemove()");
+        },
+
+        onMarkersReset: function(collection, options){
+          console.log("onMarkersReset()");
+        },
+
         /**
-         * Custom processing of REST API response before injecting it in the Backbone collection
+         * Custom processing of REST API response before injecting it in the Backbone collection:
+         * - UUID creation for arrivals
+         * - Parsing time strings to timestamps
          */
         onParseArrivals: function(response) {
           var self = this;
@@ -202,6 +255,14 @@
 
           //Returning parsed data to the collection
           return response["arrivals"];
+        },
+
+        /**
+         * Custom processing of REST API response before injecting it in the Backbone collection:
+         * - We're interested in response.markers, not response
+         */
+        onParseMarkers: function(response) {
+          return response["markers"];
         },
 
         /**
@@ -239,7 +300,7 @@
           if (str !== this._currBusStop) {
             this._currBusStop = str;
             this.reset();
-            this.refresh();
+            this.refreshDepartures();
           }
         },
         enumerable: true,
@@ -260,6 +321,7 @@
       var DepartureView = Marionette.ItemView.extend({
         template: Handlebars.compile($("#departure-template").html()),
         tagName: "item",
+        className: "route",
         modelEvents:{
           "change": function(){
             this.render();
@@ -271,6 +333,10 @@
       // It will be binded to a collection of RouteDepartures
       //---------------------------------------------------------------------
       var DeparturesView = Marionette.CollectionView.extend({
+        childView: DepartureView
+      });
+
+      var BusStopsView = Marionette.CollectionView.extend({
         childView: DepartureView
       });
 
@@ -296,26 +362,25 @@
           departures: "#route-departures"
         });
 
+        app.map = window.map = new google.maps.Map(document.getElementById('map-canvas'), {
+          zoom: 18,
+          center: new google.maps.LatLng(51.52172,-0.07151),
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        });
+
         app.model = new Model();
         app.model.initialize();
+        app.model.map = app.map;
 
         app.view = new DeparturesView();
         app.view.collection = app.model.departures;
 
         app.departures.show(app.view);
 
+        //Inits
         app.model.currBusStop = 73044;
-
-        map = window.map = new google.maps.Map(document.getElementById('map-canvas'), {
-          zoom: 18,
-          center: new google.maps.LatLng(51.52172,-0.07151),
-          mapTypeId: google.maps.MapTypeId.ROADMAP
-        });
-
-        setInterval(app.model.refresh, 30 * 1000);
+        setInterval(app.model.refreshDepartures, 30 * 1000);
       });
-
-      var map;
 
       google.maps.event.addDomListener(window, 'load', function(){
         console.log("google map on window load");
@@ -326,3 +391,4 @@
     </script>
   </body>
 </html>
+
