@@ -20,13 +20,18 @@
 
     <script type='text/javascript' src="public/js/vendor/class.js"></script>
 
-    <!--<link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">-->
-    <script>
-      var busStopApp = new Marionette.Application();
+    <!--<script type="text/template" id="departure-template">
+      <p><%- routeName %> <%- destination %> <%- nextDepartures.length %></p>
+    </script>-->
 
-      busStopApp.addRegions({
-        busStopDepartures: "#bus-stop-departures"
-      });
+    <script id="departure-template" type="text/x-handlebars-template">
+      <p>{{routeName}} {{destination}} {{nextDepartures.length}}</p>
+    </script>
+
+
+    <!--<link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">-->
+    <script type="text/javascript">
+      var app = new Marionette.Application();
 
       var RouteArrival = Backbone.Model.extend({
         defaults:{
@@ -45,12 +50,13 @@
       var RouteDeparture = RouteArrival.extend({
         idAttribute: "routeId",
         defaults:{
-          "departures": []
+          "nextDepartures": []
         }
       });
 
       var RouteDepartures = Backbone.Collection.extend({
-        model: RouteDeparture
+        model: RouteDeparture,
+        sync: null
       });
 
       var Model = Class.extend({
@@ -58,7 +64,7 @@
         _lastUpdated: undefined,
 
         arrivals:    new RouteArrivals(),       //Collection holding raw bus stop API results
-        departures:  new RouteDepartures(),     //Collection for processed arrivals data, bindable on view
+        departures:  new RouteDepartures(),     //Collection for processed arrivals data, bindable
 
         initialize: function () {
           //Custom parsing before injecting response from /bus-stops/<id>
@@ -70,7 +76,10 @@
           this.departures.reset();
         },
 
-        refresh: function(){
+        refresh: function(onSuccess, onError){
+          if(typeof onSuccess !== "function") onSuccess = function(){};
+          if(typeof onError !== "function") onError = function(){};
+
           var self = this;
 
           if(self.currBusStop){
@@ -81,47 +90,58 @@
             self.arrivals.fetch({
               dataType: "jsonp",
 
-              success: function (collection, response, options) {
-                console.log("refrescado!!");
-
-                //Setting up app's current time based on server response, instead of local time.
-                // That makes it time-zone independent, avoiding Madrid/London differences
+              success: function(arrivals, response, options) {
+                //Setting up app's current time, based on server response instead of local time.
+                // This makes the app time-zone independent, avoiding Madrid/London differences
                 self._lastUpdated = self.parseTime(response["lastUpdated"]);
 
-                //Processing arrivals in order to generate the model to departures
-                var groups = collection.groupBy("routeId");
+                //Groups arrivals by route. There exist 1-N arrivals for each route
+                var groups = arrivals.groupBy("routeId");
+
+                //Picks first arrival instance of every route and nests the rest in "nextDepartures" property
                 var departures =
                   _.chain(groups)
                   .keys()
-                  .map(function (routeId) {
-                    var routeData = collection.findWhere({"routeId": routeId});
+                  .map(function(routeId) {
+                    var routeData = arrivals.findWhere({"routeId": routeId});
                     return {
-                      "routeId":       routeId,
-                      "routeName":     routeData.get("routeName"),
-                      "destination":   routeData.get("destination"),
-                      "scheduledTime": groups[routeId][0].get(["scheduledTime"]),
-                      "departures":    new RouteArrivals(groups[routeId])
+                      "routeId":        routeData.get("routeId"),
+                      "routeName":      routeData.get("routeName"),
+                      "destination":    routeData.get("destination"),
+                      "estimatedWait":  routeData.get("estimatedWait"),
+                      "scheduledTime":  groups[routeId][0].get(["scheduledTime"]),
+
+                      "nextDepartures": new RouteArrivals(_.rest(groups[routeId]))
                     }
                   })
                   .sortBy("scheduledTime")
                   .value();
 
-                //Smart update of departures
+                //Smart update of previous departures with these newly processed ones
                 self.departures.set(departures);
+
+                console.log("model.refresh() SUCCESS!");
+                onSuccess();
               },
 
               error: function(err){
-
+                console.log("model.refresh() ERROR -->"); console.log(err);
+                onError(err);
               }
             })
+          } else {
+            onError("BUS_STOP_UNDEFINED");
           }
         },
 
-        onParseArrivals: function (response) {
+        /**
+         * Custom processing of REST API response before injecting it in the Backbone collection
+         */
+        onParseArrivals: function(response) {
           var self = this;
+          _(response["arrivals"]).each(function(arrival) {
 
-          _(response["arrivals"]).each(function (arrival) {
-            //UUID creation for the models in the collection. Needed for smart updates later on
+            //UUID creation for every models in the collection. Needed for smart updates later on
             arrival.id = arrival["routeId"] + "_" + arrival["scheduledTime"]; //.split(":").join("_");
 
             //Parsing arrival time from string to integer timestamp
@@ -132,19 +152,32 @@
           return response["arrivals"];
         },
 
-        //Transforms a time string for the API, like "[day ]hh:mm" string in an absolute integer timestamp
+        /**
+         * Parses a scheduledTime string from the API, like "[ddd ]hh:mm", into an absolute integer timestamp
+         *
+         * @param timeString
+         * @returns {number}
+         */
         parseTime: function(timeString){
           var now = new Date();
-          var minutesAndSeconds = timeString.split(":");
-          var minutes = minutesAndSeconds[0];
-          var seconds = minutesAndSeconds[1];
-          var day = now.getUTCDay();
+          var hoursAndMinutes = timeString.split(":");
+          var hours = hoursAndMinutes[0];
+          var minutes = hoursAndMinutes[1];
+          var delta = 0;
 
-          if(minutes.indexOf(" ") > -1){ minutes = minutes.split(" ")[1]; day++; }
-          return Date.UTC(now.getFullYear(), now.getUTCMonth(), day, minutes, seconds);
+          //Checks if this time string is on the next day. If that is the case it'll follow the pattern "ddd hh:mm"
+          if(hours.indexOf(" ") > -1){
+            hours = hours.split(" ")[1];
+            delta = 24 * 60 * 60 * 1000;  //Milliseconds in a day
+          }
+          return Date.UTC(now.getFullYear(), now.getUTCMonth(), now.getUTCDay(), hours, minutes) + delta;
         }
 
       });
+
+      //-----------------------------------------
+      // Getters & Setters
+      //-----------------------------------------
 
       Object.defineProperty(Model.prototype, "currBusStop", {
         get: function () {
@@ -161,17 +194,48 @@
         configurable: true
       });
 
-
-      var ArrivalView = Marionette.ItemView.extend({
-
+      Object.defineProperty(Model.prototype, "lastUpdated", {
+        get: function () {
+          return this._lastUpdated;
+        },
+        enumerable: true,
+        configurable: true
       });
 
-      var ArrivalsView = Marionette.CollectionView.extend({
-        childView: ArrivalView
 
+      var DepartureView = Marionette.ItemView.extend({
+        template: Handlebars.compile($("#departure-template").html()),
+        tagName: "item",
+        modelEvents:{
+          "change": function(){
+            this.render();
+          }
+        }
       });
 
-      busStopApp.start();
+      var DeparturesView = Marionette.CollectionView.extend({
+        childView: DepartureView
+      });
+
+      app.on("start", function () {
+        app.addRegions({
+          departures: "#bus-stop-departures"
+        });
+
+        app.model = new Model();
+        app.model.initialize();
+
+        app.view = new DeparturesView();
+        app.view.collection = app.model.departures;
+
+        app.departures.show(app.view);
+
+        app.model.currBusStop = 73044;
+        app.model.refresh(function () {
+        });
+      });
+
+      app.start();
 
     </script>
   </body>
