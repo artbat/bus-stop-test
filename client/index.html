@@ -100,7 +100,7 @@
                       "routeName":     routeData.get("routeName"),
                       "destination":   routeData.get("destination"),
                       "scheduledTime": groups[routeId][0].get(["scheduledTime"]),
-                      "departures":    groups[routeId]
+                      "departures":    new RouteArrivals(groups[routeId])
                     }
                   })
                   .sortBy("scheduledTime")
