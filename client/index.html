@@ -15,13 +15,15 @@
     </div>
 
     <div id="bus-stop-header" class="bus-stop-header">
-      <div class="stop-indicator" id="stop-indicator"></div>
+      <!--<div class="stop-indicator" id="stop-indicator"></div>
       <div class="stop-name" id="stop-name">Haymarket</div>
       <div class="stop-towards" id="stop-towards">towards Aldwych, Finsbury Square or St Barts Hospital</div>
-      <div class="button-go-here"><a id="button-go-here" href="#">O</a></div>
+      <div class="button-go-here"><a id="button-go-here" href="#">O</a></div>-->
     </div>
 
     <div id="map-canvas"></div>
+
+    <div id="last-refresh" class="last-refresh">&nbsp;Last Refresh 21:10</div>
 
     <div id="route-departures"></div>
 
@@ -40,6 +42,13 @@
       <div class="destination">{{destination}}</div>
       <div class="arrival">{{estimatedWait}}</div>
       <div class="next-departures">{{showNextDepartures nextDepartures}}</div>
+    </script>
+
+    <script id="bus-stop-header-template" type="text/x-handlebars-template">
+      <div class="stop-indicator" id="stop-indicator">{{stopIndicator}}</div>
+      <div class="stop-name" id="stop-name">{{name}}</div>
+      <div class="stop-towards" id="stop-towards">towards {{towards}}</div>
+      <div class="button-go-here"><a id="button-go-here" href="#">O</a></div>
     </script>
 
     <script type="text/javascript">
@@ -106,18 +115,17 @@
         //Overriding Collection.reset() in order to properly erase map markers
         reset: function(){
           this.each(function(model){
-            if(typeof model.get("marker") !== "undefined"){
-              model.get("marker").setMap(null);
-            }
+            model.get("marker").setMap(null);
           });
           Backbone.Collection.prototype.reset.apply(this, arguments);  //Calling "super" implementation
         }
       });
 
-      //Main app's model (in MVC terms, not Backbone terms)
-      //-----------------------------------------------------
+      //App's main model (in MVC terms, not Backbone)
+      //----------------------------------------------
       var Model = Class.extend({
-        _currBusStop:        null,              //Current bus stop ID
+        _currBusStopID:      null,              //Current bus stop ID
+        _currBusStop:        null,              //Current bus stop model
         _lastUpdated:        undefined,         //Timestamp of last update
         lastUpdatedAsString: undefined,         //String "hh:mm" of last update
         map:                 null,              //App's google map
@@ -143,7 +151,7 @@
         },
 
         //Smart update of bus stops within current map bounds ("smart" because it only adds and/or deletes what changes)
-        //------------------------------------------------------------------------------------------------------------
+        //---------------------------------------------------------------------------------------------------------------
         refreshBusStops: function(onSuccess, onError){
           if(typeof onSuccess !== "function") onSuccess = function(){};
           if(typeof onError !== "function") onError = function(){};
@@ -187,7 +195,10 @@
           google.maps.event.addListener(busStopModel.get("marker"), 'click', function(){
             console.log("click on marker " + busStopModel.id);
             //Model setup for this bus stop
-            app.model.currBusStop = busStopModel.id;
+            app.model.currBusStopID = busStopModel.id;
+
+            //Setting up bus stop data in header
+            app.busStopHeader.show(app.busStopView);
 
             //Setting up for other bus stop data
             app.map.panTo(busStopModel.get("marker").getPosition());
@@ -207,17 +218,17 @@
           console.log("onMarkersReset()");
         },
 
-        //Smart update of the Arrivals collection and process it in order to populate the departures collection
+        //Smart update of the arrivals collection and process it in order to populate the departures collection
         //------------------------------------------------------------------------------------------------------
         refreshDepartures: function(onSuccess, onError){
           if(typeof onSuccess !== "function") onSuccess = function(){};
           if(typeof onError !== "function") onError = function(){};
 
           var self = this;
-          if(self.currBusStop){
+          if(self.currBusStopID){
 
             //Setting up REST API URL to current model's bus stop
-            self.arrivals.url = "/bus-stops/" + self.currBusStop;
+            self.arrivals.url = "/bus-stops/" + self.currBusStopID;
 
             //Request to the REST API for smart updates to the collection.
             self.arrivals.fetch({
@@ -233,7 +244,7 @@
                 //Groups arrivals by route. There exist 1-N arrivals for each route
                 var groups = arrivals.groupBy("routeId");
 
-                //For each group picks the first arrival (they're time sorted) and nests the rest in the "nextDepartures" property
+                //For each group it picks the first arrival (they're time sorted) and nests the rest in the "nextDepartures" property
                 var departures =
                   _.chain(groups)
                   .keys()
@@ -324,17 +335,28 @@
       // Getters & Setters
       //-----------------------------------------
 
+      Object.defineProperty(Model.prototype, "currBusStopID", {
+        get: function () {
+          return this._currBusStopID;
+        },
+        set: function(str){
+          if (str !== this._currBusStopID) {
+            this._currBusStopID = str;
+            this._currBusStop = this.busStops.get(this._currBusStopID);
+
+            this.arrivals.reset();
+            this.departures.reset();
+
+            this.refreshDepartures();
+          }
+        },
+        enumerable: true,
+        configurable: true
+      });
+
       Object.defineProperty(Model.prototype, "currBusStop", {
         get: function () {
           return this._currBusStop;
-        },
-        set: function(str){
-          if (str !== this._currBusStop) {
-            this._currBusStop = str;
-            this.arrivals.reset();
-            this.departures.reset();
-            this.refreshDepartures();
-          }
         },
         enumerable: true,
         configurable: true
@@ -369,8 +391,8 @@
         childView: DepartureView
       });
 
-      var BusStopsView = Marionette.CollectionView.extend({
-        childView: DepartureView
+      var BusStopView = Marionette.ItemView.extend({
+        template: Handlebars.compile($("#bus-stop-header-template").html())
       });
 
       //Returns next route departures collection in a properly formatted string
@@ -397,23 +419,29 @@
         console.log("app onStart");
 
         app.addRegions({
+          busStopHeader: "#bus-stop-header",
           departures: "#route-departures"
         });
 
         app.map = window.map = new google.maps.Map(document.getElementById('map-canvas'), {
           zoom: 15,
           center: new google.maps.LatLng(51.49435320032761, -0.13895414567947073),
-          mapTypeId: google.maps.MapTypeId.ROADMAP
+          mapTypeId: google.maps.MapTypeId.ROADMAP,
+          disableDefaultUI: true
         });
 
         app.model = new Model();
         app.model.initialize();
         app.model.map = app.map;
 
-        app.view = new DeparturesView();
-        app.view.collection = app.model.departures;
+        app.busStopView = new BusStopView();
+        app.busStopView.model = app.model.currBusStop;
 
-        app.departures.show(app.view);
+        app.departuresView = new DeparturesView();
+        app.departuresView.collection = app.model.departures;
+
+        app.departures.show(app.departuresView);
+        //app.busStopHeader.show(app.busStopView);
 
         //Inits
 
