@@ -1,72 +1,51 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Bus Departures Test - Arturo Batanero (30/03/2015)</title>
-
+    <title>Bus Departures Test - Arturo Batanero</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta charset="utf-8">
-    <meta name="HandheldFriendly" content="True">
-    <meta name="MobileOptimized" content="320">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="cleartype" content="on">
-      
     <link href="https://developers.google.com/maps/documentation/javascript/examples/default.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
-    <link href="public/stylesheets/test-maquetacion.css" rel="stylesheet">
+
+    <link href="public/stylesheets/test.css" rel="stylesheet">
   </head>
 
   <body>
-
-  <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-      <symbol id="icon-refresh" viewBox="0 0 512 512">
-        <path d="m224 46c58 0 107 20 147 59c41 40 62 88 63 145c0 0 63 0 63 0c0 0-95 105-95 105c0 0-94-105-94-105c0 0 74 0 74 0c-1-42-17-78-48-108c-31-29-67-44-110-44c-43 0-80 16-110 46c-31 31-46 68-46 112c0 43 15 80 46 111c30 30 67 46 110 46c36 0 67-11 93-31c0 0 36 39 36 39c-37 30-80 45-129 45c-57 0-106-21-147-62c-41-40-62-90-62-148c0-58 21-108 62-148c41-41 90-62 147-62"/>
-      </symbol>
-    
-      <symbol id="icon-stop" viewBox="0 0 512 512">
-        <circle r="256" cy="256" cx="256" stroke-linecap="null" stroke-linejoin="null" stroke-width="5" stroke="#fff" fill="#fff"/>
-      </symbol>
-  </svg>
-
-    <header id="header" class="header">
-      <div id="title-bar" class="title-bar">
-        <h1 class="title">Bus Departures</h1>
-        <a id="button-refresh" class="button-refresh" href="#"><svg><use xlink:href="#icon-refresh"></use></svg></a>
-      </div>
-      
-      <div id="bus-stop-header" class="bus-stop-header">
-        <span class="stop-indicator-bullet"><svg><use xlink:href="#icon-stop"></use></svg></span>
-        <span class="stop-indicator" id="stop-indicator">P</span>
-        <h2 class="stop-name" id="stop-name">werwer</h2>
-        <p class="stop-towards" id="stop-towards">wererw</p>
-      </div>
-      
-      <div id="map-canvas"></div>
-
-      <div id="last-refresh" class="last-refresh">&nbsp;Last Refresh <strong>21:10</strong></div>
-    </header>
-
-    <ol id="route-departures" />
-
-  <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
-  <script type='text/javascript' src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-  <script type='text/javascript' src="public/js/vendor/underscore.js"></script>
-  <script type='text/javascript' src="public/js/vendor/backbone.js"></script>
-  <script type='text/javascript' src="public/js/vendor/backbone.marionette.js"></script>
-  <script type='text/javascript' src="public/js/vendor/bootstrap.min.js"></script>
-  <script type='text/javascript' src="public/js/vendor/handlebars.min.js"></script>
-  <script type='text/javascript' src="public/js/vendor/class.js"></script>
-
-  <script id="departure-template" type="text/x-handlebars-template">
-    <div>
-      <span class="name">{{routeName}}</span>
-      <span class="destination">{{destination}}</span>
+    <div id="title-bar" class="title-bar">
+      <div class="title">Countdown</div>
+      <div class="button-refresh"><a id="button-refresh" href="#">C</a></div>
     </div>
-    <div>
-      <span class="arrival">{{estimatedWait}}</span>
-      <span class="next-departures">{{showNextDepartures nextDepartures}}</span>
-    </div>
-  </script>
 
-  <script type="text/javascript">
+    <div id="bus-stop-header" class="bus-stop-header">
+      <div class="stop-indicator" id="stop-indicator"></div>
+      <div class="stop-name" id="stop-name">Please, select any bus stop...</div>
+      <div class="stop-towards" id="stop-towards"></div>
+      <div class="button-go-here"><a id="button-go-here" href="#">O</a></div>
+    </div>
+
+    <div id="map-canvas"></div>
+
+    <div id="last-refresh" class="last-refresh">&nbsp;Last Refresh --:--</div>
+
+    <div id="route-departures"></div>
+
+    <script type='text/javascript' src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+    <script type='text/javascript' src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type='text/javascript' src="public/js/vendor/underscore.js"></script>
+    <script type='text/javascript' src="public/js/vendor/backbone.js"></script>
+    <script type='text/javascript' src="public/js/vendor/backbone.marionette.js"></script>
+    <script type='text/javascript' src="public/js/vendor/bootstrap.min.js"></script>
+    <script type='text/javascript' src="public/js/vendor/handlebars.min.js"></script>
+    <script type='text/javascript' src="public/js/vendor/class.js"></script>
+
+    <script id="departure-template" type="text/x-handlebars-template">
+      <div class="name">{{routeName}}</div>
+      <div class="destination">{{destination}}</div>
+      <div class="arrival">{{estimatedWait}}</div>
+      <div class="next-departures">{{showNextDepartures nextDepartures}}</div>
+    </script>
+
+    <script type="text/javascript">
       var app = new Marionette.Application();
 
       //Backbone Model Constructor representing a single route arrival
@@ -160,7 +139,7 @@
           this.arrivals.parse = this.onParseArrivals.bind(this);
           this.busStops.parse = this.onParseMarkers.bind(this);
 
-          //Bus stop collection event handlers &ndash;&gt; Map markers management
+          //Bus stop collection event handlers --> Map markers management
           this.busStops.on("add", this.addMarker.bind(this));
           this.busStops.on("remove", this.removeMarker.bind(this));
         },
@@ -194,7 +173,7 @@
             },
 
             error: function(err){
-              console.log("model.refreshDepartures() ERROR &ndash;&gt;"); console.log(err);
+              console.log("model.refreshDepartures() ERROR -->"); console.log(err);
               onError(err);
             }
           });
@@ -228,25 +207,24 @@
             $("#stop-indicator").html(app.model.currBusStop.get("stopIndicator"));
             $("#stop-name").html(app.model.currBusStop.get("name"));
             $("#stop-towards").html("towards " + app.model.currBusStop.get("towards"));
-
-            /*$("#bus-stop-header")
+            $("#bus-stop-header")
               .delay(750)
-              .animate({height: '3.5em'}, 500);*/
+              .animate({height: '3.5em'}, 500);
 
             //Setting up last update data
             $("#last-refresh")
               .html("&nbsp;Last Refresh " + app.model.lastUpdatedAsString)
-              /*.delay(750)
-              .animate({height: '1.5em'}, 500);*/
+              .delay(750)
+              .animate({height: '1.5em'}, 500);
 
-            /*$("#map-canvas")
+            $("#map-canvas")
               .animate({height: '40%'}, {
                 duration: 750,
                 progress: function(){
                   google.maps.event.trigger(app.map, "resize");
                   app.map.panTo(currMarker.getPosition());
                 }
-              });*/
+              });
 
             //Setting up for other bus stop data
             app.map.panTo(busStopModel.get("marker").getPosition());
@@ -453,37 +431,28 @@
         }
       );
 
-      var docHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-      document.getElementById("map-canvas").style.height = (docHeight * .4)+"px";
-
-      // Carga del mapa
       google.maps.event.addDomListener(window, 'load', function(){
-        console.log("window loaded");
+        console.log("window onLoad");
+
+        //$("#bus-stop-header").css("height", "0em");
+        /*$("#bus-stop-header").hide();
+        $("#last-refresh").hide();*/
+
+        app.start();
+      });
+
+      app.on("start", function() {
+        console.log("app onStart");
+
+        app.addRegions({
+          departures: "#route-departures"
+        });
 
         app.map = window.map = new google.maps.Map(document.getElementById('map-canvas'), {
           zoom: 16,
           center: new google.maps.LatLng(51.49416873829742, -0.09468598547180296),
           mapTypeId: google.maps.MapTypeId.ROADMAP,
-          disableDefaultUI: false
-        });
-
-        // Padding de la lista de estaciones
-        var headerHeight = document.getElementById("header").offsetHeight;
-        console.log(headerHeight);
-        document.getElementById("route-departures").style.paddingTop = headerHeight+"px";
-
-        //Let's go!
-        app.start();
-      });
-
-      app.on("start", function() {
-        console.log("app started");
-
-        //App inits
-        //-----------
-
-        app.addRegions({
-          departures: "#route-departures"
+          disableDefaultUI: true
         });
 
         app.model = new Model();
@@ -495,10 +464,9 @@
 
         app.departures.show(app.departuresView);
 
-        //Map event handlers
-        //---------------------------
+        //Inits
 
-        //Fetch bus stops within map bounds when it's ready the first time
+        //Fetch bus stops within map bounds when it's ready
         google.maps.event.addListenerOnce(app.map, 'idle', function(){
           app.model.refreshBusStops();
         });
@@ -508,7 +476,7 @@
           if(this.getZoom() < 15) this.setZoom(15);
         });
 
-        //Refresh markers after user finishes map interaction
+        //Refresh markers when user stops with map interaction
         google.maps.event.addListener(map, 'center_changed', _.debounce(function(){
           app.model.refreshBusStops();
         }, 250));
@@ -516,29 +484,6 @@
       });
 
     </script>
-
-    <!--<script type="text/javascript">
-      // Altura del mapa
-      var docHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-      document.getElementById("map-canvas").style.height = (docHeight * .4)+"px";
-
-      // Carga del mapa
-      google.maps.event.addDomListener(window, 'load', function(){
-        console.log("google map on window load");
-
-        var map = window.map = new google.maps.Map(document.getElementById('map-canvas'), {
-          zoom: 17,
-          center: new google.maps.LatLng(51.52172,-0.07151),
-          mapTypeId: google.maps.MapTypeId.ROADMAP,
-          disableDefaultUI: true
-        });
-
-        // Padding de la lista de estaciones
-        var headerHeight = document.getElementById("header").offsetHeight;
-        console.log(headerHeight);
-        document.getElementById("route-departures").style.paddingTop = headerHeight+"px";
-      });
-    </script>-->
-
   </body>
 </html>
+
