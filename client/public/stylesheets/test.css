@@ -16,6 +16,10 @@ body {
   height: 3.5em;
 }
 
+#bus-stop-header .stop-towards {
+  font-size: 0.75em;
+}
+
 #map-canvas {
   height: 30%;
   margin: 0px;

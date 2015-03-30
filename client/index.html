@@ -8,6 +8,7 @@
 
     <link href="public/stylesheets/test.css" rel="stylesheet">
   </head>
+
   <body>
     <div id="title-bar" class="title-bar">
       <div class="title">Countdown</div>
@@ -15,10 +16,10 @@
     </div>
 
     <div id="bus-stop-header" class="bus-stop-header">
-      <!--<div class="stop-indicator" id="stop-indicator"></div>
-      <div class="stop-name" id="stop-name">Haymarket</div>
-      <div class="stop-towards" id="stop-towards">towards Aldwych, Finsbury Square or St Barts Hospital</div>
-      <div class="button-go-here"><a id="button-go-here" href="#">O</a></div>-->
+      <div class="stop-indicator" id="stop-indicator"></div>
+      <div class="stop-name" id="stop-name"></div>
+      <div class="stop-towards" id="stop-towards"></div>
+      <div class="button-go-here"><a id="button-go-here" href="#">O</a></div>
     </div>
 
     <div id="map-canvas"></div>
@@ -42,13 +43,6 @@
       <div class="destination">{{destination}}</div>
       <div class="arrival">{{estimatedWait}}</div>
       <div class="next-departures">{{showNextDepartures nextDepartures}}</div>
-    </script>
-
-    <script id="bus-stop-header-template" type="text/x-handlebars-template">
-      <div class="stop-indicator" id="stop-indicator">{{stopIndicator}}</div>
-      <div class="stop-name" id="stop-name">{{name}}</div>
-      <div class="stop-towards" id="stop-towards">towards {{towards}}</div>
-      <div class="button-go-here"><a id="button-go-here" href="#">O</a></div>
     </script>
 
     <script type="text/javascript">
@@ -198,7 +192,10 @@
             app.model.currBusStopID = busStopModel.id;
 
             //Setting up bus stop data in header
-            app.busStopHeader.show(app.busStopView);
+            $("#stop-indicator").html(app.model.currBusStop.get("stopIndicator"));
+            $("#stop-name").html(app.model.currBusStop.get("name"));
+            $("#stop-towards").html("towards " + app.model.currBusStop.get("towards"));
+            $("#bus-stop-header").show();
 
             //Setting up for other bus stop data
             app.map.panTo(busStopModel.get("marker").getPosition());
@@ -391,10 +388,6 @@
         childView: DepartureView
       });
 
-      var BusStopView = Marionette.ItemView.extend({
-        template: Handlebars.compile($("#bus-stop-header-template").html())
-      });
-
       //Returns next route departures collection in a properly formatted string
       Handlebars.registerHelper('showNextDepartures',
         function(departuresCollection) {
@@ -424,8 +417,8 @@
         });
 
         app.map = window.map = new google.maps.Map(document.getElementById('map-canvas'), {
-          zoom: 15,
-          center: new google.maps.LatLng(51.49435320032761, -0.13895414567947073),
+          zoom: 16,
+          center: new google.maps.LatLng(51.49692023607355, -0.14003950574849044),
           mapTypeId: google.maps.MapTypeId.ROADMAP,
           disableDefaultUI: true
         });
@@ -434,20 +427,30 @@
         app.model.initialize();
         app.model.map = app.map;
 
-        app.busStopView = new BusStopView();
-        app.busStopView.model = app.model.currBusStop;
-
         app.departuresView = new DeparturesView();
         app.departuresView.collection = app.model.departures;
 
         app.departures.show(app.departuresView);
-        //app.busStopHeader.show(app.busStopView);
 
         //Inits
 
         google.maps.event.addListenerOnce(app.map, 'idle', function(){
           app.model.refreshBusStops();
         });
+
+        //Avoid creating too much markers
+        google.maps.event.addListener(map, 'zoom_changed', function(event) {
+          if(this.getZoom() < 15) this.setZoom(15);
+        });
+
+        var throttleTimer;
+        google.maps.event.addListener(map, 'center_changed', function() {
+          clearTimeout(throttleTimer);
+          throttleTimer = setTimeout(function () {
+            app.model.refreshBusStops();
+          }, 250);
+        });
+
       });
 
     </script>
