@@ -11,7 +11,7 @@ requirejs.config({
     "marionette": "./backbone.marionette",
     "class": "./class",
     "handlebars": "./handlebars.min",
-    "googlemaps": "./maps-api.v3"
+    "googlemaps": "./maps.api.v3"
   },
 
   "shim": {

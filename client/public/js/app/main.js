@@ -1,5 +1,5 @@
-define(["class"], function(Class) {
-  console.log(new Class());
+define(["app/views/Templates"], function(templates) {
+  console.log(templates);
 });
 
 
