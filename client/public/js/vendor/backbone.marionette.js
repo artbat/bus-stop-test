@@ -964,7 +964,7 @@
   // ----------
   
   // A multi-purpose object to use as a controller for
-  // modules and routers, and as a mediator for workflow
+  // app and routers, and as a mediator for workflow
   // and coordination of other objects, views, and more.
   Marionette.Controller = function(options) {
     this.options = options || {};
@@ -3560,7 +3560,7 @@
     // for a given module instance.
     this.initialize = options.initialize || this.initialize;
   
-    // Set up an internal store for sub-modules.
+    // Set up an internal store for sub-app.
     this.submodules = {};
   
     this._setupInitializersAndFinalizers();
@@ -3580,7 +3580,7 @@
   // can be used as an event aggregator or pub/sub.
   _.extend(Marionette.Module.prototype, Backbone.Events, {
   
-    // By default modules start with their parents.
+    // By default app start with their parents.
     startWithParent: true,
   
     // Initialize is an empty function by default. Override it with your own
@@ -3605,7 +3605,7 @@
       // Prevent re-starting a module that is already started
       if (this._isInitialized) { return; }
   
-      // start the sub-modules (depth-first hierarchy)
+      // start the sub-app (depth-first hierarchy)
       _.each(this.submodules, function(mod) {
         // check to see if we should start the sub-module with this parent
         if (mod.startWithParent) {
@@ -3623,7 +3623,7 @@
     },
   
     // Stop this module by running its finalizers and then stop all of
-    // the sub-modules for this module
+    // the sub-app for this module
     stop: function() {
       // if we are not initialized, don't bother finalizing
       if (!this._isInitialized) { return; }
@@ -3631,8 +3631,8 @@
   
       this.triggerMethod('before:stop');
   
-      // stop the sub-modules; depth-first, to make sure the
-      // sub-modules are stopped / finalized before parents
+      // stop the sub-app; depth-first, to make sure the
+      // sub-app are stopped / finalized before parents
       _.invoke(this.submodules, 'stop');
   
       // run the finalizers
@@ -3683,7 +3683,7 @@
     triggerMethod: Marionette.triggerMethod
   });
   
-  // Class methods to create modules
+  // Class methods to create app
   _.extend(Marionette.Module, {
   
     // Create a module, hanging off the app parameter as the parent object.
