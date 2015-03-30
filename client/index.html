@@ -72,7 +72,7 @@
 
       //Backbone Model Constructor representing a single route arrival
       //-----------------------------------------------------------
-      app.RouteArrival = Backbone.Model.extend({
+      var RouteArrival = Backbone.Model.extend({
         defaults:{
           "routeId":       undefined,
           "routeName":     undefined,
@@ -83,15 +83,15 @@
 
       //Backbone Collection Constructor for route arrivals. Populates from the REST API
       //------------------------------------------------------------------------------------
-      app.RouteArrivals = Backbone.Collection.extend({
-        model: app.RouteArrival,
+      var RouteArrivals = Backbone.Collection.extend({
+        model: RouteArrival,
         url: "/bus-stops/{id}"
       });
 
       //Backbone Model Constructor representing a single departure data.
       //  Inherits from RouteArrival, adding a sub-collection for the next arrivals of the same route
       //----------------------------------------------------------------------------------------------
-      app.RouteDeparture = app.RouteArrival.extend({
+      var RouteDeparture = RouteArrival.extend({
         idAttribute: "routeId",
         defaults:{
           "nextDepartures": []
@@ -101,14 +101,14 @@
       //Constructor for a Backbone Collection of route arrivals. Binded to the view.
       // Populates from the processing of the RouteArrivals collection, grouping arrivals by route
       //-------------------------------------------------------------------------------------------
-      app.RouteDepartures = Backbone.Collection.extend({
-        model: app.RouteDeparture,
+      var RouteDepartures = Backbone.Collection.extend({
+        model: RouteDeparture,
         sync: null
       });
 
       //Constructor for a Backbone Model that holds a single bus stop data
       //--------------------------------------------------------------------
-      app.BusStop = Backbone.Model.extend({
+      var BusStop = Backbone.Model.extend({
         idAttribute: "id",
         defaults:{
           "smsCode":       undefined,
@@ -125,8 +125,8 @@
 
       //Backbone Collection Constructor for bus stops. Populated from the REST API
       //-------------------------------------------------------------------------------
-      app.BusStops = Backbone.Collection.extend({
-        model: app.BusStop,
+      var BusStops = Backbone.Collection.extend({
+        model: BusStop,
 
         //Overriding Collection.reset() in order to properly erase map markers
         reset: function(){
@@ -139,7 +139,7 @@
 
       //App's main model (in MVC terms, not Backbone)
       //----------------------------------------------
-      app.Model = Class.extend({
+      var Model = Class.extend({
 
         //Private properties (see getters/setters)
         _currBusStopID:      null,              //Current bus stop ID
@@ -148,20 +148,14 @@
 
         lastUpdatedAsString: "--:--",           //last update string as "hh:mm"
         map:                 null,              //App's google map
-        app:                 null,
 
-        busStops:    undefined,            //Collection of bus stops (straight from REST API response)
-        arrivals:    undefined,       //Collection of raw bus stop arrivals (straight from REST API response)
-        departures:  undefined,     //Collection for processed arrivals data (based on RouteArrivals)
+        busStops:    new BusStops(),            //Collection of bus stops (straight from REST API response)
+        arrivals:    new RouteArrivals(),       //Collection of raw bus stop arrivals (straight from REST API response)
+        departures:  new RouteDepartures(),     //Collection for processed arrivals data (based on RouteArrivals)
 
         //-------------------------
 
-        initialize: function(app) {
-          this.app = app;
-          this.busStops = new app.BusStops();
-          this.arrivals = new app.RouteArrivals();
-          this.departures = new app.RouteDepartures();
-
+        initialize: function() {
           //Custom parsing before injecting API responses into collections
           this.arrivals.parse = this.onParseArrivals.bind(this);
           this.busStops.parse = this.onParseMarkers.bind(this);
@@ -307,7 +301,7 @@
                       "estimatedWait":  routeData.get("estimatedWait"),
                       "scheduledTime":  groups[routeId][0].get(["scheduledTime"]),
 
-                      "nextDepartures": new self.app.RouteArrivals(_.rest(groups[routeId]))
+                      "nextDepartures": new RouteArrivals(_.rest(groups[routeId]))
                     }
                   })
                   .sortBy("scheduledTime")
@@ -386,7 +380,7 @@
       //-----------------------------------------
 
       //Setting model's current bus stop id triggers several model updates
-      Object.defineProperty(app.Model.prototype, "currBusStopID", {
+      Object.defineProperty(Model.prototype, "currBusStopID", {
         get: function () {
           return this._currBusStopID;
         },
@@ -406,7 +400,7 @@
       });
 
       //Read only
-      Object.defineProperty(app.Model.prototype, "currBusStop", {
+      Object.defineProperty(Model.prototype, "currBusStop", {
         get: function () {
           return this._currBusStop;
         },
@@ -415,7 +409,7 @@
       });
 
       //Read only
-      Object.defineProperty(app.Model.prototype, "lastUpdated", {
+      Object.defineProperty(Model.prototype, "lastUpdated", {
         get: function () {
           return this._lastUpdated;
         },
@@ -426,7 +420,7 @@
 
       //Constructor for the view of a single bus stop's departure.
       //-------------------------------------------------------------
-      app.DepartureView = Marionette.ItemView.extend({
+      var DepartureView = Marionette.ItemView.extend({
         template: Handlebars.compile($("#departure-template").html()),
         tagName: "li",
         className: "route clearfix"
@@ -440,8 +434,8 @@
       //Constructor for the view of the collection of bus stop's departures.
       // It will be binded to a collection of RouteDepartures
       //---------------------------------------------------------------------
-      app.DeparturesView = Marionette.CollectionView.extend({
-        childView: app.DepartureView
+      var DeparturesView = Marionette.CollectionView.extend({
+        childView: DepartureView
       });
 
       //Returns next route departures collection in a properly formatted string
@@ -468,7 +462,7 @@
 
         app.map = window.map = new google.maps.Map(document.getElementById('map-canvas'), {
           zoom: 16,
-          center: new google.maps.LatLng(51.49416873829742, -0.09468598547180296),
+          center: new google.maps.LatLng(51.49477020555122, -0.09794553876490086),
           mapTypeId: google.maps.MapTypeId.ROADMAP,
           disableDefaultUI: false
         });
@@ -492,11 +486,11 @@
           departures: "#route-departures"
         });
 
-        app.model = new app.Model();
-        app.model.initialize(app);
+        app.model = new Model();
+        app.model.initialize();
         app.model.map = app.map;
 
-        app.departuresView = new app.DeparturesView();
+        app.departuresView = new DeparturesView();
         app.departuresView.collection = app.model.departures;
 
         app.departures.show(app.departuresView);
