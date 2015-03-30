@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>ID test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta charset="utf-8">
     <link href="https://developers.google.com/maps/documentation/javascript/examples/default.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
@@ -132,8 +133,6 @@
         departures:  new RouteDepartures(),     //Collection for processed arrivals data (based on RouteArrivals)
 
         //-------------------------
-        // PUBLIC METHODS
-        //-------------------------
 
         initialize: function() {
           //Custom parsing before injecting API responses into collections
@@ -164,7 +163,7 @@
           'southWest='+bounds.getSouthWest().lat()+','+bounds.getSouthWest().lng();
           console.log("fetching bus stops from " + self.busStops.url);
 
-          //Request to the REST API for smart updates to the collection.
+          //API Request for updates.
           self.busStops.fetch({
             dataType: "jsonp",
 
@@ -202,15 +201,30 @@
 
             //Model setup for this bus stop
             app.model.currBusStopID = busStopModel.id;
+            var currMarker = app.model.currBusStop.get("marker");
 
             //Setting up bus stop data in header (not very MVC manipulating the view from here... time constraints, sorry! O8-)
             $("#stop-indicator").html(app.model.currBusStop.get("stopIndicator"));
             $("#stop-name").html(app.model.currBusStop.get("name"));
             $("#stop-towards").html("towards " + app.model.currBusStop.get("towards"));
-            $("#bus-stop-header").delay(500).animate({height: '3.5em'}, 500);
+            $("#bus-stop-header")
+              .delay(750)
+              .animate({height: '3.5em'}, 500);
 
             //Setting up last update data
-            $("#last-refresh").html("&nbsp;Last Refresh " + app.model.lastUpdatedAsString).delay(500).animate({height: '1.5em'}, 500);
+            $("#last-refresh")
+              .html("&nbsp;Last Refresh " + app.model.lastUpdatedAsString)
+              .delay(750)
+              .animate({height: '1.5em'}, 500);
+
+            $("#map-canvas")
+              .animate({height: '40%'}, {
+                duration: 750,
+                progress: function(){
+                  google.maps.event.trigger(app.map, "resize");
+                  app.map.panTo(currMarker.getPosition());
+                }
+              });
 
             //Setting up for other bus stop data
             app.map.panTo(busStopModel.get("marker").getPosition());
@@ -309,8 +323,8 @@
         },
 
         /**
-         * Custom processing of REST API response before injecting it in the Backbone collection:
-         * - We're interested in response.markers, not response
+         * Custom processing of API response before injection
+         * We're interested in response.markers, not response
          */
         onParseMarkers: function(response) {
           return response["markers"];
@@ -343,6 +357,7 @@
       // Getters & Setters
       //-----------------------------------------
 
+      //Setting model's current bus stop id triggers several model updates
       Object.defineProperty(Model.prototype, "currBusStopID", {
         get: function () {
           return this._currBusStopID;
@@ -362,6 +377,7 @@
         configurable: true
       });
 
+      //Read only
       Object.defineProperty(Model.prototype, "currBusStop", {
         get: function () {
           return this._currBusStop;
@@ -370,6 +386,7 @@
         configurable: true
       });
 
+      //Read only
       Object.defineProperty(Model.prototype, "lastUpdated", {
         get: function () {
           return this._lastUpdated;
@@ -384,12 +401,12 @@
       var DepartureView = Marionette.ItemView.extend({
         template: Handlebars.compile($("#departure-template").html()),
         tagName: "item",
-        className: "route",
-        modelEvents:{
+        className: "route"
+        /*modelEvents:{
           "change": function(){
             this.render();
           }
-        }
+        }*/
       });
 
       //Constructor for the view of the collection of bus stop's departures.

@@ -2,11 +2,14 @@
 <html>
   <head>
     <title>ID test</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta charset="utf-8">
+
     <link href="https://developers.google.com/maps/documentation/javascript/examples/default.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
 
-    <link href="public/stylesheets/test.css" rel="stylesheet">
+    <link href="public/stylesheets/test-maquetacion.css" rel="stylesheet">
   </head>
 
   <body>
@@ -19,7 +22,6 @@
       <div class="stop-indicator" id="stop-indicator"></div>
       <div class="stop-name" id="stop-name">Haymarket</div>
       <div class="stop-towards" id="stop-towards">towards Aldwych, Finsbury Square or St Barts Hospital</div>
-      <div class="button-go-here"><a id="button-go-here" href="#">O</a></div>
     </div>
     
     <div id="map-canvas"></div>
@@ -105,9 +107,10 @@
         console.log("google map on window load");
 
         var map = window.map = new google.maps.Map(document.getElementById('map-canvas'), {
-          zoom: 19,
+          zoom: 16,
           center: new google.maps.LatLng(51.52172,-0.07151),
-          mapTypeId: google.maps.MapTypeId.ROADMAP
+          mapTypeId: google.maps.MapTypeId.ROADMAP,
+          disableDefaultUI: true
         });
       });
     </script>
