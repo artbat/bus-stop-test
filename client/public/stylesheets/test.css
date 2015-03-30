@@ -13,7 +13,7 @@ body {
 #bus-stop-header {
   background: red;
   color: white;
-  height: 3.5em;
+  height: 0em;  /*3.5em*/
 }
 
 #bus-stop-header .stop-towards {
@@ -29,6 +29,7 @@ body {
 #last-refresh {
   background: red;
   color: white;
+  height: 0em;  /*1.5em*/
 }
 
 #route-departures {

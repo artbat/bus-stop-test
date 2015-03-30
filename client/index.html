@@ -17,14 +17,14 @@
 
     <div id="bus-stop-header" class="bus-stop-header">
       <div class="stop-indicator" id="stop-indicator"></div>
-      <div class="stop-name" id="stop-name"></div>
+      <div class="stop-name" id="stop-name">Please, select any bus stop...</div>
       <div class="stop-towards" id="stop-towards"></div>
       <div class="button-go-here"><a id="button-go-here" href="#">O</a></div>
     </div>
 
     <div id="map-canvas"></div>
 
-    <div id="last-refresh" class="last-refresh">&nbsp;Last Refresh 21:10</div>
+    <div id="last-refresh" class="last-refresh">&nbsp;Last Refresh --:--</div>
 
     <div id="route-departures"></div>
 
@@ -35,7 +35,6 @@
     <script type='text/javascript' src="public/js/vendor/backbone.marionette.js"></script>
     <script type='text/javascript' src="public/js/vendor/bootstrap.min.js"></script>
     <script type='text/javascript' src="public/js/vendor/handlebars.min.js"></script>
-
     <script type='text/javascript' src="public/js/vendor/class.js"></script>
 
     <script id="departure-template" type="text/x-handlebars-template">
@@ -118,15 +117,23 @@
       //App's main model (in MVC terms, not Backbone)
       //----------------------------------------------
       var Model = Class.extend({
+
+        //Private properties (see getters/setters)
         _currBusStopID:      null,              //Current bus stop ID
         _currBusStop:        null,              //Current bus stop model
-        _lastUpdated:        undefined,         //Timestamp of last update
-        lastUpdatedAsString: undefined,         //String "hh:mm" of last update
+        _lastUpdated:        undefined,         //Last update's timestamp
+
+        //Public properties
+        lastUpdatedAsString: "--:--",           //last update string as "hh:mm"
         map:                 null,              //App's google map
 
-        busStops:    new BusStops(),            //Collection of bus stops
-        arrivals:    new RouteArrivals(),       //Collection holding raw bus stop arrivals API results
-        departures:  new RouteDepartures(),     //Collection for processed arrivals data, bindable in view
+        busStops:    new BusStops(),            //Collection of bus stops (straight from REST API response)
+        arrivals:    new RouteArrivals(),       //Collection of raw bus stop arrivals (straight from REST API response)
+        departures:  new RouteDepartures(),     //Collection for processed arrivals data (based on RouteArrivals)
+
+        //-------------------------
+        // PUBLIC METHODS
+        //-------------------------
 
         initialize: function() {
           //Custom parsing before injecting API responses into collections
@@ -134,9 +141,8 @@
           this.busStops.parse = this.onParseMarkers.bind(this);
 
           //Bus stop collection event handlers --> Map markers management
-          this.busStops.on("add", this.onMarkerAdd.bind(this));
-          this.busStops.on("remove", this.onMarkerRemove.bind(this));
-          this.busStops.on("reset", this.onMarkersReset.bind(this));
+          this.busStops.on("add", this.addMarker.bind(this));
+          this.busStops.on("remove", this.removeMarker.bind(this));
         },
 
         reset: function(){
@@ -156,6 +162,7 @@
           self.busStops.url = '/bus-stops?' +
           'northEast='+bounds.getNorthEast().lat()+','+bounds.getNorthEast().lng() + '&' +
           'southWest='+bounds.getSouthWest().lat()+','+bounds.getSouthWest().lng();
+          console.log("fetching bus stops from " + self.busStops.url);
 
           //Request to the REST API for smart updates to the collection.
           self.busStops.fetch({
@@ -175,27 +182,35 @@
 
         //Adds a marker when a new bus stop is added to the bus stops collection
         //------------------------------------------------------------------------
-        onMarkerAdd: function(busStopModel, busStopscollection, options){
+        addMarker: function(busStopModel, busStopscollection, options){
 
           //Marker creation
           busStopModel.set("marker", new google.maps.Marker({
             position: new google.maps.LatLng(busStopModel.get("lat"), busStopModel.get("lng")),
             map: map,
-            icon: { path: google.maps.SymbolPath.CIRCLE, scale: 10, strokeColor: '#fff', strokeWeight: 2, fillColor: '#f00', fillOpacity:1 },
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 10,
+              strokeColor: '#fff', strokeWeight: 2, fillColor: '#f00', fillOpacity:1
+            },
             busStopId: busStopModel.get("id")
           }));
 
-          //Marker events
+          //Marker click event handler
           google.maps.event.addListener(busStopModel.get("marker"), 'click', function(){
             console.log("click on marker " + busStopModel.id);
+
             //Model setup for this bus stop
             app.model.currBusStopID = busStopModel.id;
 
-            //Setting up bus stop data in header
+            //Setting up bus stop data in header (not very MVC manipulating the view from here... time constraints, sorry! O8-)
             $("#stop-indicator").html(app.model.currBusStop.get("stopIndicator"));
             $("#stop-name").html(app.model.currBusStop.get("name"));
             $("#stop-towards").html("towards " + app.model.currBusStop.get("towards"));
-            $("#bus-stop-header").show();
+            $("#bus-stop-header").delay(500).animate({height: '3.5em'}, 500);
+
+            //Setting up last update data
+            $("#last-refresh").html("&nbsp;Last Refresh " + app.model.lastUpdatedAsString).delay(500).animate({height: '1.5em'}, 500);
 
             //Setting up for other bus stop data
             app.map.panTo(busStopModel.get("marker").getPosition());
@@ -207,12 +222,8 @@
 
         //Removes the map marker when the bus stop model is about to be removed from its collection
         //-------------------------------------------------------------------------------------------
-        onMarkerRemove: function(model, collection, options){
-          model.get("marker").setMap(null);
-        },
-
-        onMarkersReset: function(collection, options){
-          console.log("onMarkersReset()");
+        removeMarker: function(busStopModel, collection, options){
+          busStopModel.get("marker").setMap(null);
         },
 
         //Smart update of the arrivals collection and process it in order to populate the departures collection
@@ -405,6 +416,11 @@
 
       google.maps.event.addDomListener(window, 'load', function(){
         console.log("window onLoad");
+
+        //$("#bus-stop-header").css("height", "0em");
+        /*$("#bus-stop-header").hide();
+        $("#last-refresh").hide();*/
+
         app.start();
       });
 
@@ -412,13 +428,12 @@
         console.log("app onStart");
 
         app.addRegions({
-          busStopHeader: "#bus-stop-header",
           departures: "#route-departures"
         });
 
         app.map = window.map = new google.maps.Map(document.getElementById('map-canvas'), {
           zoom: 16,
-          center: new google.maps.LatLng(51.49692023607355, -0.14003950574849044),
+          center: new google.maps.LatLng(51.49416873829742, -0.09468598547180296),
           mapTypeId: google.maps.MapTypeId.ROADMAP,
           disableDefaultUI: true
         });
@@ -434,22 +449,20 @@
 
         //Inits
 
+        //Fetch bus stops within map bounds when it's ready
         google.maps.event.addListenerOnce(app.map, 'idle', function(){
           app.model.refreshBusStops();
         });
 
-        //Avoid creating too much markers
+        //Avoid creating too much markers zooming out
         google.maps.event.addListener(map, 'zoom_changed', function(event) {
           if(this.getZoom() < 15) this.setZoom(15);
         });
 
-        var throttleTimer;
-        google.maps.event.addListener(map, 'center_changed', function() {
-          clearTimeout(throttleTimer);
-          throttleTimer = setTimeout(function () {
-            app.model.refreshBusStops();
-          }, 250);
-        });
+        //Refresh markers when user stops with map interaction
+        google.maps.event.addListener(map, 'center_changed', _.debounce(function(){
+          app.model.refreshBusStops();
+        }, 250));
 
       });
 
