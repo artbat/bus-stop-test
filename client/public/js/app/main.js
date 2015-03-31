@@ -1,12 +1,13 @@
 define([
   "marionette",
   "underscore",
+  "jquery",
   "app/models/Model",
   "app/views/DeparturesView",
   "async!//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"
 ],
 
-function(Marionette, _, Model, DeparturesView) {
+function(Marionette, _, $, Model, DeparturesView) {
   "use strict";
 
   window.app = new Marionette.Application();
@@ -17,7 +18,7 @@ function(Marionette, _, Model, DeparturesView) {
 
   //Gmap creation. In a real web app, location wouldn't be simulated
   app.map = new google.maps.Map(document.getElementById('map-canvas'), {
-    zoom: 15,
+    zoom: 16,
     center: new google.maps.LatLng(51.49498464081166, -0.09950421728487369),
     mapTypeId: google.maps.MapTypeId.ROADMAP,
     disableDefaultUI: false
@@ -46,7 +47,7 @@ function(Marionette, _, Model, DeparturesView) {
     });
     app.departures.show(app.view);
 
-    //Additional Map event handlers
+    //Additional Event handlers
     //----------------------------
     //Fetch bus stops within map bounds when it's ready the first time
     google.maps.event.addListenerOnce(app.map, 'idle', function(){

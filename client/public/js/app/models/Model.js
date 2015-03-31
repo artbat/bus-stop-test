@@ -19,6 +19,7 @@ function(Class, BusStops, RouteArrivals, RouteDepartures) {
     _currBusStopID:      null,              //Current bus stop ID
     _currBusStop:        null,              //Current bus stop model
     _lastUpdated:        undefined,         //Last update's timestamp
+    _departuresTimer:    undefined,
 
     lastUpdatedAsString: "--:--",           //last update string as "hh:mm"
     map:                 null,              //App's google map
@@ -130,6 +131,11 @@ function(Class, BusStops, RouteArrivals, RouteDepartures) {
       var self = this;
       if(self.currBusStopID){
 
+        //Reset the timer for refreshing data
+        if(typeof self._departuresTimer !== "undefined"){
+          window.clearInterval(self._departuresTimer); self._departuresTimer = undefined;
+        }
+
         //Setting up REST API URL to current model's bus stop
         self.arrivals.url = "/bus-stops/" + self.currBusStopID;
 
@@ -168,6 +174,11 @@ function(Class, BusStops, RouteArrivals, RouteDepartures) {
 
             //Smart updates previous departures with the new ones
             self.departures.set(departures);
+
+            //Setting up timer for updates. According to TFL, less than 30sg is useless
+            if(typeof self._departuresTimer === "undefined"){
+              self._departuresTimer = setInterval(self.refreshDepartures.bind(self), 30*1000);
+            }
 
             console.log("model.refreshDepartures() SUCCESS!");
             onSuccess();
