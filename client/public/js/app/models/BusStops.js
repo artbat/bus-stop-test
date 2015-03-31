@@ -27,7 +27,7 @@ function(Backbone, BusStop) {
     }
   });
 
-  return RouteArrivals;
+  return BusStops;
 });
 
 

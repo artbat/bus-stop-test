@@ -5,22 +5,18 @@
 
 define([
   "marionette",
+  "handlebars",
   "app/views/Templates",
   "app/views/HandlebarsHelpers"
 ],
 
-function(Marionette, templates) {
+function(Marionette, Handlebars, templates) {
   "use strict";
 
   var DepartureView = Marionette.ItemView.extend({
     template: Handlebars.compile(templates["departure-template"]),
     tagName: "li",
     className: "route clearfix"
-    /*modelEvents:{
-     "change": function(){
-     this.render();
-     }
-     }*/
   });
 
   return DepartureView;

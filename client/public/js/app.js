@@ -4,17 +4,20 @@ requirejs.config({
 
   "paths": {
     "app": "../app",
+    "async": "./async",
     "jquery": "./jquery.min",
     "bootstrap": "./backbone.marionette",
     "underscore": "./underscore",
     "backbone": "./backbone",
     "marionette": "./backbone.marionette",
     "class": "./class",
-    "handlebars": "./handlebars.min",
-    "googlemaps": "./maps.api.v3"
+    "handlebars": "./handlebars.min"
   },
 
   "shim": {
+    async: {
+      exports: "async"
+    },
     jquery: {
       exports: "jQuery"
     },
@@ -36,9 +39,6 @@ requirejs.config({
     },
     handlebars: {
       exports: "Handlebars"
-    },
-    googlemaps: {
-      exports: "Maps"
     }
   }
 });

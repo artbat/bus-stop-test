@@ -77,11 +77,11 @@ function(Class, BusStops, RouteArrivals, RouteDepartures) {
     //Adds a marker when a new bus stop is added to the bus stops collection
     //------------------------------------------------------------------------
     addMarker: function(busStopModel, busStopscollection, options){
-
+      
       //Marker creation
       busStopModel.set("marker", new google.maps.Marker({
         position: new google.maps.LatLng(busStopModel.get("lat"), busStopModel.get("lng")),
-        map: map,
+        map: this.map,
         icon: {
           path: google.maps.SymbolPath.CIRCLE,
           scale: 10,

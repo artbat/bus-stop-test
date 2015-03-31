@@ -479,21 +479,17 @@
       app.on("start", function() {
         console.log("app started");
 
-        //App inits
-        //-----------
-
-        app.addRegions({
-          departures: "#route-departures"
-        });
-
         app.model = new Model();
         app.model.initialize();
         app.model.map = app.map;
 
-        app.departuresView = new DeparturesView();
-        app.departuresView.collection = app.model.departures;
+        app.view = new DeparturesView();
+        app.view.collection = app.model.departures;
 
-        app.departures.show(app.departuresView);
+        app.addRegions({
+          departures: "#route-departures"
+        });
+        app.departures.show(app.view);
 
         //Map event handlers
         //---------------------------
