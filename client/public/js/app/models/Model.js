@@ -44,6 +44,7 @@ function(Class, BusStops, RouteArrivals, RouteDepartures) {
       this.departures.reset();
     },
 
+
     //Smart update of bus stops within current map bounds ("smart" because it only adds and/or deletes what changes)
     //---------------------------------------------------------------------------------------------------------------
     refreshBusStops: function(onSuccess, onError){
@@ -68,7 +69,7 @@ function(Class, BusStops, RouteArrivals, RouteDepartures) {
         },
 
         error: function(err){
-          console.log("model.refreshDepartures() ERROR &ndash;&gt;"); console.log(err);
+          console.log("model.refreshDepartures() ERROR -->"); console.log(err);
           onError(err);
         }
       });
@@ -77,7 +78,8 @@ function(Class, BusStops, RouteArrivals, RouteDepartures) {
     //Adds a marker when a new bus stop is added to the bus stops collection
     //------------------------------------------------------------------------
     addMarker: function(busStopModel, busStopscollection, options){
-      
+      var self = this;
+
       //Marker creation
       busStopModel.set("marker", new google.maps.Marker({
         position: new google.maps.LatLng(busStopModel.get("lat"), busStopModel.get("lng")),
@@ -89,44 +91,26 @@ function(Class, BusStops, RouteArrivals, RouteDepartures) {
         },
         busStopId: busStopModel.get("id")
       }));
+      console.log("Adding marker");
 
       //Marker click event handler
       google.maps.event.addListener(busStopModel.get("marker"), 'click', function(){
         console.log("click on marker " + busStopModel.id);
 
         //Model setup for this bus stop
-        app.model.currBusStopID = busStopModel.id;
-        var currMarker = app.model.currBusStop.get("marker");
+        self.currBusStopID = busStopModel.id;
+        var currMarker = self.currBusStop.get("marker");
 
         //Setting up bus stop data in header (not very MVC manipulating the view from here... time constraints, sorry! O8-)
-        $("#stop-indicator").html(app.model.currBusStop.get("stopIndicator"));
-        $("#stop-name").html(app.model.currBusStop.get("name"));
-        $("#stop-towards").html("towards " + app.model.currBusStop.get("towards"));
-
-        /*$("#bus-stop-header")
-         .delay(750)
-         .animate({height: '3.5em'}, 500);*/
+        $("#stop-indicator").html(self.currBusStop.get("stopIndicator"));
+        $("#stop-name").html(self.currBusStop.get("name"));
+        $("#stop-towards").html("towards " + self.currBusStop.get("towards"));
 
         //Setting up last update data
-        $("#last-refresh")
-          .html("&nbsp;Last Refresh " + app.model.lastUpdatedAsString)
-        /*.delay(750)
-         .animate({height: '1.5em'}, 500);*/
-
-        /*$("#map-canvas")
-         .animate({height: '40%'}, {
-         duration: 750,
-         progress: function(){
-         google.maps.event.trigger(app.map, "resize");
-         app.map.panTo(currMarker.getPosition());
-         }
-         });*/
+        $("#last-refresh").html("&nbsp;Last Refresh " + self.lastUpdatedAsString);
 
         //Setting up for other bus stop data
         app.map.panTo(busStopModel.get("marker").getPosition());
-        setTimeout(function(){
-          app.model.refreshBusStops();
-        }, 250);
       });
     },
 
@@ -134,6 +118,7 @@ function(Class, BusStops, RouteArrivals, RouteDepartures) {
     //-------------------------------------------------------------------------------------------
     removeMarker: function(busStopModel, collection, options){
       busStopModel.get("marker").setMap(null);
+      console.log("Removing marker");
     },
 
     //Smart update of the arrivals collection and process it in order to populate the departures collection
@@ -291,6 +276,7 @@ function(Class, BusStops, RouteArrivals, RouteDepartures) {
     configurable: true
   });
 
+  //Returning constructor
   return Model;
 });
 

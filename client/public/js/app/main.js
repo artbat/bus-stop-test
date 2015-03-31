@@ -17,8 +17,8 @@ function(Marionette, _, Model, DeparturesView) {
 
   //Gmap creation. In a real web app, location wouldn't be simulated
   app.map = new google.maps.Map(document.getElementById('map-canvas'), {
-    zoom: 16,
-    center: new google.maps.LatLng(51.49477020555122, -0.09794553876490086),
+    zoom: 15,
+    center: new google.maps.LatLng(51.49498464081166, -0.09950421728487369),
     mapTypeId: google.maps.MapTypeId.ROADMAP,
     disableDefaultUI: false
   });
@@ -46,7 +46,6 @@ function(Marionette, _, Model, DeparturesView) {
     });
     app.departures.show(app.view);
 
-
     //Additional Map event handlers
     //----------------------------
     //Fetch bus stops within map bounds when it's ready the first time
@@ -55,12 +54,13 @@ function(Marionette, _, Model, DeparturesView) {
     });
 
     //Avoid creating too much markers zooming out
-    google.maps.event.addListener(map, 'zoom_changed', function(event) {
+    google.maps.event.addListener(app.map, 'zoom_changed', _.debounce(function(){
       if(this.getZoom() < 15) this.setZoom(15);
-    });
+      app.model.refreshBusStops();
+    }, 250));
 
     //Refresh markers after user finishes map interaction
-    google.maps.event.addListener(map, 'center_changed', _.debounce(function(){
+    google.maps.event.addListener(app.map, 'center_changed', _.debounce(function(){
       app.model.refreshBusStops();
     }, 250));
   });
