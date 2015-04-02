@@ -17,4 +17,5 @@ src/js/modules/*
 src/*
 processPhonegapArt.bat
 cache/
-
+*.pdf
+heroku*
