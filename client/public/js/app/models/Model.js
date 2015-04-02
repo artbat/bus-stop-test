@@ -118,6 +118,7 @@ function(Class, BusStops, RouteArrivals, RouteDepartures) {
     //Removes the map marker when the bus stop model is about to be removed from its collection
     //-------------------------------------------------------------------------------------------
     removeMarker: function(busStopModel, collection, options){
+      google.maps.event.clearInstanceListeners(busStopModel.get("marker"));
       busStopModel.get("marker").setMap(null);
       console.log("Removing marker");
     },
